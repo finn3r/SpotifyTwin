@@ -20,15 +20,29 @@ const SideBar = () => {
     const [playlists, setPlaylists] = useState<PlaylistObjectSimplified[]>([]);
     const [playlistId, setPlaylistId] = useRecoilState(playlistIdState);
 
+    const getPlaylist = async () => {
+        const playlistArray: PlaylistObjectSimplified[] = [];
+        for (let i = 0; i < 200; i++) {
+            const length: number = await spotifyApi.getUserPlaylists({offset: i * 50, limit: 50}).then((data) => {
+                playlistArray.push(...data.body.items);
+                return data.body.items.length;
+            });
+            if(length !== 50){
+                setPlaylists(playlistArray);
+                break;
+            }
+        }
+    }
+
     useEffect(() => {
         if (spotifyApi.getAccessToken()) {
-            spotifyApi.getUserPlaylists().then((data) => {
-                setPlaylists(data.body.items);
-            })
+            getPlaylist().then();
         }
     }, [session, spotifyApi]);
+
     return (
-        <div className="text-gray-500 p-5 text-xs border-r border-gray-900 h-screen overflow-y-scroll scrollbar-hide lg:text-sm sm:max-w-[12rem] lg:max-w-[15rem] pb-36">
+        <div
+            className="text-gray-500 p-5 text-xs border-r border-gray-900 h-screen overflow-y-scroll scrollbar-hide lg:text-sm sm:max-w-[12rem] lg:max-w-[15rem] pb-36">
             <div className={"space-y-4"}>
                 {/*Buttons*/}
                 <button

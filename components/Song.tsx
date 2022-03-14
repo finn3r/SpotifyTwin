@@ -1,20 +1,24 @@
 import React from 'react';
 import PlaylistTrackObject = SpotifyApi.PlaylistTrackObject;
 import {millisToMinutesAndSeconds} from "../lib/time";
-import {useRecoilState} from "recoil";
-import {currentTrackIdState, isPlayingState} from "../Atoms/songAtom";
+import {useRecoilValue} from "recoil";
 import useSpotify from "../hooks/useSpotify";
+import {deviceAtom} from "../Atoms/deviceAtom";
+import {currentTrackState, isPlayingState} from "../Atoms/songAtom";
 
-const Song = (prop: { track: PlaylistTrackObject, order: number }) => {
+const Song = (prop: { track: PlaylistTrackObject, order: number, playlistUri: string }) => {
     const spotifyApi = useSpotify();
-    const [currentTrackId, setCurrentTrackId] = useRecoilState(currentTrackIdState);
-    const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
+    const device = useRecoilValue(deviceAtom);
+    const currentTrack = useRecoilValue(currentTrackState);
+    const isPlaying = useRecoilValue(isPlayingState);
 
     const playSong = () => {
-        setCurrentTrackId(prop.track.track.id);
-        setIsPlaying(true);
         spotifyApi.play({
-            uris: [prop.track.track.uri]
+            device_id: device,
+            context_uri: prop.playlistUri,
+            offset: {
+                uri: prop.track.track.uri
+            }
         }).then();
     }
 
@@ -24,19 +28,30 @@ const Song = (prop: { track: PlaylistTrackObject, order: number }) => {
             onClick={playSong}
         >
             <div className={"flex items-center space-x-4"}>
-                <p>{prop.order + 1}</p>
+                <div
+                    className={"h-6 w-4 " + (currentTrack?.id === prop.track.track.id ? "text-green-600" : "")}
+                >
+                    {((currentTrack?.id === prop.track.track.id)&&isPlaying) ?
+                        <img src={"https://open.scdn.co/cdn/images/equaliser-animated-green.f93a2ef4.gif"}/>
+                        :
+                        (prop.order + 1)
+                    }
+                </div>
                 <img
                     className={"h-10 w-10"}
                     src={prop.track.track.album.images[0].url}
-                    alt=""
                 />
                 <div>
-                    <p className={"w-36 lg:w-64 text-white truncate"}>{prop.track.track.name}</p>
+                    <p
+                        className={"w-36 lg:w-64 truncate " + (currentTrack?.id === prop.track.track.id ? "text-green-600" : "text-white")}
+                    >
+                        {prop.track.track.name}
+                    </p>
                     <p className={"w-40"}>{prop.track.track.artists[0].name}</p>
                 </div>
             </div>
             <div className={"flex items-center justify-end ml-0 sm:justify-between"}>
-                <p className={"w-40 hidden sm:inline"}>{prop.track.track.album.name}</p>
+                <p className={"w-40 hidden sm:inline w-36 lg:w-64 truncate"}>{prop.track.track.album.name}</p>
                 <p>{millisToMinutesAndSeconds(prop.track.track.duration_ms)}</p>
             </div>
         </div>
