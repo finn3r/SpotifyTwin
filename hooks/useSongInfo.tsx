@@ -6,7 +6,7 @@ import {currentTrackState} from "../Atoms/songAtom";
 const UseSongInfo = () => {
     const spotifyApi = useSpotify();
     const currentTrack = useRecoilValue(currentTrackState);
-    const [songInfo, setSongInfo] = useState<any>(null);
+    const [songInfo, setSongInfo] = useState<SpotifyApi.SingleTrackResponse>();
 
     useEffect(() => {
         const fetchSongInfo = async () => {

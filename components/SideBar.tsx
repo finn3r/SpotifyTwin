@@ -42,7 +42,7 @@ const SideBar = () => {
 
     return (
         <div
-            className="text-gray-500 p-5 text-xs border-r border-gray-900 h-screen overflow-y-scroll scrollbar-hide lg:text-sm sm:max-w-[12rem] lg:max-w-[15rem] pb-36">
+            className="hidden sm:block text-gray-500 p-5 text-xs border-r border-gray-900 h-screen overflow-y-scroll scrollbar-hide lg:text-sm sm:max-w-[12rem] lg:max-w-[15rem] pb-36">
             <div className={"space-y-4"}>
                 {/*Buttons*/}
                 <button

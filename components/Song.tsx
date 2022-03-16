@@ -1,7 +1,7 @@
 import React from 'react';
 import PlaylistTrackObject = SpotifyApi.PlaylistTrackObject;
 import {millisToMinutesAndSeconds} from "../lib/time";
-import {useRecoilValue} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import useSpotify from "../hooks/useSpotify";
 import {deviceAtom} from "../Atoms/deviceAtom";
 import {currentTrackState, isPlayingState} from "../Atoms/songAtom";
