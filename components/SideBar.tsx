@@ -10,18 +10,17 @@ import {
 import {signOut, useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
 import useSpotify from "../hooks/useSpotify";
-import PlaylistObjectSimplified = SpotifyApi.PlaylistObjectSimplified;
 import {useRecoilState} from "recoil";
 import {playlistIdState} from "../Atoms/platlistAtom";
 
 const SideBar = () => {
     const spotifyApi = useSpotify();
     const {data: session} = useSession();
-    const [playlists, setPlaylists] = useState<PlaylistObjectSimplified[]>([]);
+    const [playlists, setPlaylists] = useState<SpotifyApi.PlaylistObjectSimplified[]>([]);
     const [playlistId, setPlaylistId] = useRecoilState(playlistIdState);
 
     const getPlaylist = async () => {
-        const playlistArray: PlaylistObjectSimplified[] = [];
+        const playlistArray: SpotifyApi.PlaylistObjectSimplified[] = [];
         for (let i = 0; i < 200; i++) {
             const length: number = await spotifyApi.getUserPlaylists({offset: i * 50, limit: 50}).then((data) => {
                 playlistArray.push(...data.body.items);

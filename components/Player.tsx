@@ -36,9 +36,6 @@ const Player = () => {
 
     useEffect(() => {
         setInputValue(0);
-    }, [trackState?.duration]);
-
-    useEffect(() => {
         setProgress(0);
     }, [currentTrack?.id])
 
