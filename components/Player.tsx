@@ -20,18 +20,23 @@ const Player = () => {
     const {data: session} = useSession();
     const [currentTrack, setCurrentTrack] = useRecoilState(currentTrackState);
     const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
+    const [,setDevice] = useRecoilState(deviceAtom);
     const [player, setPlayer] = useState<Spotify.Player>();
-    const [device, setDevice] = useRecoilState(deviceAtom);
-    const [volume, setVolume] = useState(0.5);
-    const [volumeOff, setVolumeOff] = useState(false);
+    const [volume, setVolume] = useState({
+        value: 0.5,
+        isOff: false
+    })
     const [trackState, setTrackState] = useState<{ duration: number; position: number; updateTime: number; }>();
     const [progress, setProgress] = useState(0);
     const [inputValue, setInputValue] = useState(0);
     const [inputActive, setInputActive] = useState(false);
 
     const volumeOffHandler = () => {
-        setVolumeOff(!volumeOff);
-        (!volumeOff) ? player?.setVolume(0) : player?.setVolume(volume);
+        setVolume({
+            ...volume,
+            isOff: !volume.isOff
+        });
+        (!volume.isOff) ? player?.setVolume(0) : player?.setVolume(volume.value);
     };
 
     useEffect(() => {
@@ -55,7 +60,10 @@ const Player = () => {
         document.body.appendChild(script);
         window.onSpotifyWebPlaybackSDKReady = () => {
             const lastVolume: number = localStorage.getItem("volume") ? JSON.parse(localStorage.getItem("volume")!) : 0.5;
-            setVolume(lastVolume);
+            setVolume({
+                ...volume,
+                value: lastVolume
+            });
             const player = new window.Spotify.Player({
                 name: 'Finner-spotify',
                 getOAuthToken: cb => {
@@ -63,9 +71,9 @@ const Player = () => {
                 },
                 volume: lastVolume,
             });
-            setPlayer(player);
             player.addListener('ready', ({device_id}) => {
                 setDevice(device_id);
+                setPlayer(player);
                 console.log('Ready with Device ID', device_id);
                 spotifyApi.getMyRecentlyPlayedTracks().then((data) => {
                     spotifyApi.play({
@@ -92,7 +100,7 @@ const Player = () => {
                     updateTime: performance.now()
                 });
             })
-            player.connect().then();
+            player.connect().catch(error => console.log(error));
         };
     }, []);
 
@@ -157,7 +165,7 @@ const Player = () => {
                 </div>
                 {/*Right*/}
                 <div className={"flex items-center space-x-3 md:space-x-4 justify-end pr-5"}>
-                    {volumeOff || volume === 0 ?
+                    {volume.isOff || volume.value === 0 ?
                         <VolumeOffIcon className={"button"} onClick={volumeOffHandler}/>
                         :
                         <VolumeUpIcon className={"button"} onClick={volumeOffHandler}/>
@@ -166,11 +174,14 @@ const Player = () => {
                         className={"w-14 md:w-28"}
                         type="range"
                         step={0.01}
-                        value={volumeOff ? 0 : volume}
+                        value={volume.isOff ? 0 : volume.value}
                         min={0} max={1}
                         onChange={(e) => {
                             localStorage.setItem("volume", JSON.stringify(Number(e.target.value)));
-                            setVolume(Number(e.target.value));
+                            setVolume({
+                                ...volume,
+                                value: Number(e.target.value)
+                            });
                             player?.setVolume(Number(e.target.value));
                         }}
                     />

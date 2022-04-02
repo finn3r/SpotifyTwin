@@ -1,14 +1,20 @@
 import React from 'react';
-import {useRecoilValue} from "recoil";
-import {playlistState} from "../Atoms/platlistAtom";
 import Song from "./Song";
+import {isArray} from "lodash";
 
-const Songs = () => {
-    const playlist = useRecoilValue(playlistState);
+const Songs = (prop: {playlist: SpotifyApi.SinglePlaylistResponse | SpotifyApi.SavedTrackObject[] | undefined}) => {
+    let playlistUri: string;
+    let tracks;
+    if (isArray(prop.playlist)) {
+        tracks = prop.playlist;
+    } else{
+        tracks = prop.playlist?.tracks.items;
+        playlistUri = "";
+    }
     return (
-        <div className={"px-8 flex flex-col text-white space-y-1 pb-28"}>
-            {playlist?.tracks.items.map((track, i) => (
-                <Song key={track.track.id} track={track} order={i} playlistUri={playlist.uri}/>
+        <div className={"flex flex-col text-white space-y-1 pb-28"}>
+            {tracks?.map((track, i) => (
+                <Song key={track.track.id} track={track} order={i} playlistUri={playlistUri}/>
             ))}
         </div>
     );
