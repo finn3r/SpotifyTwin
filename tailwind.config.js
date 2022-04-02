@@ -4,7 +4,11 @@ module.exports = {
     './components/**/*.{html,js,tsx,ts}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        'sm': '700px',
+      }
+    },
   },
   plugins: [
     require('tailwind-scrollbar-hide')
