@@ -2,7 +2,6 @@ import {
     HeartIcon,
     HomeIcon,
     LibraryIcon,
-    LogoutIcon,
     PlusCircleIcon,
     RssIcon,
     SearchIcon

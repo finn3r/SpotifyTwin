@@ -10,7 +10,7 @@ const Playlist: NextPage = () => {
     const spotifyApi = useSpotify();
     const router = useRouter();
     const [color, setColor] = useState<string>("");
-    const [playlist, setPlaylist] = useState<{id: string, info: undefined|SpotifyApi.SinglePlaylistResponse, error: boolean}>({
+    const [playlist, setPlaylist] = useState<{ id: string, info: undefined | SpotifyApi.SinglePlaylistResponse, error: boolean }>({
         id: "",
         info: undefined,
         error: false
@@ -31,9 +31,14 @@ const Playlist: NextPage = () => {
                         info: data.body,
                         id: id
                     });
-                    new Vibrant(data?.body?.images?.[0]?.url).getPalette()
-                        .then((palette) => setColor(palette.DarkVibrant!.hex))
-                        .catch(() => setColor("grey"));
+                    /*data.body.images?.[0]?.url ?
+                        new Vibrant(data.body.images[0].url).getPalette()
+                            .then((palette) => setColor(palette.DarkVibrant!.hex))
+                        : setColor("grey");*/
+                    data.body.images?.[0]?.url ?
+                        new Vibrant(data.body.images[0].url).getPalette()
+                            .then((palette) => setColor(palette.DarkVibrant!.hex))
+                        : setColor("grey");
                 })
                 .catch(error => {
                     console.log(error);
@@ -81,8 +86,8 @@ export default Playlist;
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const session = await getSession(context);
 
-    return{
-        props:{
+    return {
+        props: {
             session
         }
     }
