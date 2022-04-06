@@ -7,9 +7,11 @@ import {
     SearchIcon
 } from "@heroicons/react/outline";
 import {useSession} from "next-auth/react";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import useSpotify from "../hooks/useSpotify";
 import {useRouter} from "next/router";
+import {useRecoilState} from "recoil";
+import {userPlaylistsState} from "../Atoms/platlistAtom";
 
 const SideBar = () => {
     const spotifyApi = useSpotify();
@@ -17,7 +19,7 @@ const SideBar = () => {
     const path = router.route;
     const {id: playlistId} = router.query;
     const {data: session} = useSession();
-    const [playlists, setPlaylists] = useState<SpotifyApi.PlaylistObjectSimplified[]>([]);
+    const [playlists, setPlaylists] = useRecoilState(userPlaylistsState);
 
     const getPlaylist = async () => {
         const playlistArray: SpotifyApi.PlaylistObjectSimplified[] = [];

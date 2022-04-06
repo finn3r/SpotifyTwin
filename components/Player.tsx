@@ -100,7 +100,22 @@ const Player = () => {
                     updateTime: performance.now()
                 });
             })
-            player.connect().catch(error => console.log(error));
+            player.connect().catch(() => {
+                /*const script_two = document.createElement("script");
+                script_two.src = "https://open.spotify.com/embed-podcast/iframe-api/v1";
+                script_two.async = true;
+
+                document.body.appendChild(script_two);
+
+                window.onSpotifyIframeApiReady = (IFrameAPI) => {
+                    let element = document.getElementById('test');
+                    let options = {
+                        uri: 'spotify:episode:7makk4oTQel546B0PZlDM5'
+                    };
+                    let callback = (EmbedController) => {};
+                    IFrameAPI.createController(element, options, callback);
+                };*/
+            });
         };
     }, []);
 

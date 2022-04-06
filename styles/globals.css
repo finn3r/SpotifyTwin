@@ -6,4 +6,25 @@
     .button {
         @apply h-5 w-5 cursor-pointer hover:scale-125 transition transform duration-100 ease-out
     }
+    .savedTracks{
+        position: relative;
+        grid-column-start: 1;
+        grid-column-end: 3;
+        @apply flex flex-col content-start m-2 rounded-xl p-3 hover:cursor-pointer justify-between;
+    }
+    .savedTracks_background{
+        transition: opacity 500ms;
+        opacity: 0.8;
+        z-index: 0;
+        top:0;
+        left:0;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(149.46deg,#450af5,#8e8ee5 99.16%);
+        @apply rounded-xl
+    }
+    .savedTracks:hover > .savedTracks_background{
+        opacity: 1;
+    }
 }
