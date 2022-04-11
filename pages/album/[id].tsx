@@ -5,11 +5,11 @@ import Songs from "../../components/Songs";
 import {NextPage} from "next";
 import {useRouter} from "next/router";
 
-const Playlist: NextPage = () => {
+const Album: NextPage = () => {
     const spotifyApi = useSpotify();
     const router = useRouter();
     const [color, setColor] = useState<string>("");
-    const [playlist, setPlaylist] = useState<{ id: string, info: undefined | SpotifyApi.SinglePlaylistResponse, error: boolean }>({
+    const [album, setAlbum] = useState<{ id: string, info: undefined | SpotifyApi.SingleAlbumResponse, error: boolean }>({
         id: "",
         info: undefined,
         error: false
@@ -17,16 +17,16 @@ const Playlist: NextPage = () => {
     });
     useEffect(() => {
         const {id} = router.query;
-        setPlaylist({
-            ...playlist,
+        setAlbum({
+            ...album,
             error: false
         });
-        if ((typeof id === "string") && (id != playlist.id)) {
+        if ((typeof id === "string") && (id != album.id)) {
             spotifyApi
-                .getPlaylist(id)
+                .getAlbum(id)
                 .then((data) => {
-                    setPlaylist({
-                        ...playlist,
+                    setAlbum({
+                        ...album,
                         info: data.body,
                         id: id
                     });
@@ -37,8 +37,8 @@ const Playlist: NextPage = () => {
                 })
                 .catch(error => {
                     console.log(error);
-                    setPlaylist({
-                        ...playlist,
+                    setAlbum({
+                        ...album,
                         error: true
                     });
                 })
@@ -46,19 +46,19 @@ const Playlist: NextPage = () => {
     }, [router])
     return (
         <div className={"flex-grow h-screen overflow-y-scroll scrollbar-hide w-full"}>
-            {(playlist.error) ?
+            {(album.error) ?
                 <div className={"h-screen flex justify-center items-center"}>
                     <h1 className={"text-white text-2xl md:text-3xl xl:text-5xl font-bold"}>
-                        Playlist not found.
+                        Album not found.
                     </h1>
                 </div> :
-                (playlist.info) ?
+                (album.info) ?
                     <section
                         className={`flex items-end space-x-7 h-80 text-white p-8`}
                         style={{backgroundImage: `linear-gradient(to bottom, ${color}, #000)`}}
                     >
-                        {playlist.info.images?.[0]?.url ? <img
-                            src={playlist.info.images[0].url}
+                        {album.info.images?.[0]?.url ? <img
+                            src={album.info.images[0].url}
                             alt=""
                             className={"object-cover h-44 w-44 shadow-2xl"}
                         /> : <div className={"h-44 w-44 shadow-2xl bg-[#808080]"}>
@@ -71,17 +71,17 @@ const Playlist: NextPage = () => {
                             </svg>
                         </div>}
                         <div>
-                            <p>PLAYLIST</p>
+                            <p>ALBUM</p>
                             <h1 className={"text-2xl md:text-3xl xl:text-5xl font-bold"}>
-                                {playlist.info.name}
+                                {album.info.name}
                             </h1>
                         </div>
                     </section> : <div/>}
             <div>
-                <Songs playlist={playlist.info}/>
+                <Songs playlist={album.info}/>
             </div>
         </div>
     );
 };
 
-export default Playlist;
+export default Album;
