@@ -54,7 +54,7 @@ const SideBar = () => {
                     <SearchIcon className="h-5 w-5"/>
                     <p>Search</p>
                 </button>
-                <button className={`flex items-center space-x-2 hover:text-white ${("/collection/playlists" == path) ? "text-white" : ""}`} onClick={() => router.push(`/collection/playlists`)}>
+                <button className={`flex items-center space-x-2 hover:text-white ${(path.includes("/collection")&&!path.includes("/tracks")) ? "text-white" : ""}`} onClick={() => router.push(`/collection/playlists`)}>
                     <LibraryIcon className="h-5 w-5"/>
                     <p>Your Library</p>
                 </button>
