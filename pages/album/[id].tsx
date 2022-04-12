@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import useSpotify from "../../hooks/useSpotify";
 import Songs from "../../components/Songs";
-import {NextPage} from "next";
 import {useRouter} from "next/router";
 import AudioPage from "../../components/AudioPage";
 
-const Album: NextPage = () => {
+const Album = () => {
     const spotifyApi = useSpotify();
     const router = useRouter();
     const [album, setAlbum] = useState<{ id: string, info: undefined | SpotifyApi.SingleAlbumResponse, error: boolean }>({

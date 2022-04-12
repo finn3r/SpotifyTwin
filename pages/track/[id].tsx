@@ -7,5 +7,4 @@ const Track = () => {
         </div>
     );
 };
-
-    export default Track;
+export default Track;

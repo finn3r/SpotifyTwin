@@ -4,7 +4,7 @@ import useSpotify from "../../hooks/useSpotify";
 import Collection from "../../components/Collection";
 import CollectionCell from "../../components/CollectionCell";
 import axios from 'axios';
-import {router} from "next/client";
+import {useRouter} from "next/router";
 
 export interface ISavesPodcasts {
     data: {
@@ -17,6 +17,7 @@ export interface ISavesPodcasts {
 const Podcasts = () => {
     const {data: session} = useSession();
     const spotifyApi = useSpotify();
+    const router = useRouter();
     const [podcasts, setPodcasts] = React.useState<SpotifyApi.SavedShowObject[]>();
     const [savedPodcasts, setSavedPodcasts] = useState<{ info: string, count: number }>();
 
