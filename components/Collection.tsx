@@ -30,7 +30,7 @@ const Collection: React.FC = ({children}) => {
                    onClick={() => router.push("/collection/albums")}>Albums</p>
             </header>
             <div
-                className={"grid-flow-row h-[85vh] scrollbar-hide overflow-y-scroll auto-rows-min " + (columnCount !== 0 ? "grid" : "hidden")}
+                className={"pb-36 grid-flow-row h-screen scrollbar-hide overflow-y-scroll auto-rows-min " + (columnCount !== 0 ? "grid" : "hidden")}
                 style={{gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`}}>
                 {children}
             </div>

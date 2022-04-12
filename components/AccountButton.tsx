@@ -7,13 +7,13 @@ const AccountButton = () => {
     const [focus, setFocus] = useState(false);
     return (
         <button
-            className={"absolute top-5 right-8"}
+            className={"absolute top-5 right-8 z-40"}
             onBlur={() => setFocus(false)}
             onClick={() => setFocus(!focus)}
         >
             <div
                 className={"flex flex-col rounded-3xl items-center opacity-90 cursor-pointer"}>
-                <div className={"flex rounded-3xl bg-black space-x-3 flex-row items-center p-1 z-40 text-white"}>
+                <div className={"flex rounded-3xl bg-black space-x-3 flex-row items-center p-1 text-white"}>
                     {session?.user.image ? <img
                         className={"rounded-full w-10 h-10"}
                         src={session?.user.image}

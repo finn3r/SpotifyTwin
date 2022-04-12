@@ -4,21 +4,13 @@ import useSpotify from "../../hooks/useSpotify";
 import Collection from "../../components/Collection";
 import CollectionCell from "../../components/CollectionCell";
 import axios from 'axios';
+import {router} from "next/client";
 
-interface ISavesPodcastsItems {
-    data:{
-        items:{
-            episode: {
-                images: {
-                  url:string
-                }[],
-                name:string,
-                show:{
-                    name:string
-                }
-            }
-        }[];
-        total:number;
+export interface ISavesPodcasts {
+    data: {
+        items: SpotifyApi.SavedEpisodeObject[];
+        total: number;
+        next: string;
     }
 }
 
@@ -28,38 +20,38 @@ const Podcasts = () => {
     const [podcasts, setPodcasts] = React.useState<SpotifyApi.SavedShowObject[]>();
     const [savedPodcasts, setSavedPodcasts] = useState<{ info: string, count: number }>();
 
-    const getSavedPodcasts = async () => {
-        const instance = axios.create({
-            baseURL: 'https://api.spotify.com',
-            headers: {'Authorization': "Bearer " + spotifyApi.getAccessToken() ?? ""}
-        });
-        instance.get("/v1/me/episodes").then((data) => {
-            const podcastsData: ISavesPodcastsItems = data as ISavesPodcastsItems;
-            let info: string = "";
-            console.log(data);
-            for (let i = 0; i < podcastsData.data.items.length; i++) info += podcastsData.data.items[i].episode.name + " - " + podcastsData.data.items[i].episode.show.name + " • ";
-            setSavedPodcasts({
-                info: info,
-                count: data.data.total as number
-            })
-        }).catch((e) => console.log(e));
-    }
-
-
     const getPodcasts = async (offset: number, podcasts?: SpotifyApi.SavedShowObject[]) => {
         spotifyApi.getMySavedShows({offset: offset, limit: 50}).then((data) => {
             if (data.body.next) {
                 const offset: number = Number(data.body.next.split("offset=")[1].split("&")[0]);
-                getPodcasts(offset, [...podcasts??[],...data.body.items]);
-            } else{
-                setPodcasts([...podcasts??[],...data.body.items])
+                getPodcasts(offset, [...podcasts ?? [], ...data.body.items]);
+            } else {
+                setPodcasts([...podcasts ?? [], ...data.body.items])
             }
         })
     }
 
+    const getSavedPodcasts = async (token: string) => {
+        const instance = axios.create({
+            baseURL: 'https://api.spotify.com/v1/me/episodes',
+            headers: {'Authorization': "Bearer " + token ?? ""}
+        });
+        return instance.get("").then((data) => {
+            const podcastsData: ISavesPodcasts = data as ISavesPodcasts;
+            let info: string = "";
+            for (let i = 0; i < podcastsData.data.items.length; i++) info += podcastsData.data.items[i].episode.name + " - " + podcastsData.data.items[i].episode.show.name + " • ";
+            setSavedPodcasts ({
+                info: info,
+                count: data.data.total as number
+            })
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
     useEffect(() => {
         if (spotifyApi.getAccessToken()) {
-            getSavedPodcasts().then();
+            getSavedPodcasts(spotifyApi.getAccessToken()!).then();
             getPodcasts(0).then();
         }
     }, [session, spotifyApi]);
@@ -68,6 +60,7 @@ const Podcasts = () => {
         <Collection>
             <div
                 className={"saved_collection"}
+                onClick={() => router.push('/collection/episodes')}
             >
                 <div className={"saved_background saved_podcasts_background"}/>
                 <div className={"line-clamp-3 m-5 mt-12 z-10"}>
