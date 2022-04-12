@@ -2,11 +2,13 @@ import React from 'react';
 import Song from "./Song";
 import {isArray} from "lodash";
 
-const Songs = (props: { playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.SavedTrackObject[] | SpotifyApi.AlbumObjectFull | SpotifyApi.ShowObject | SpotifyApi.SavedEpisodeObject[] | undefined }) => {
+const Songs = (props: { playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.TrackObjectFull[] | SpotifyApi.SavedTrackObject[] | SpotifyApi.AlbumObjectFull | SpotifyApi.ShowObject | SpotifyApi.SavedEpisodeObject[] | undefined }) => {
     let playlistUri: string = "";
     let tracks: SpotifyApi.TrackObjectFull[];
     if (isArray(props.playlist)) {
-        if((props.playlist as SpotifyApi.SavedTrackObject[])[0].track !== undefined){
+        if((props.playlist as SpotifyApi.TrackObjectFull[])[0]?.name !== undefined){
+            tracks = props.playlist as SpotifyApi.TrackObjectFull[];
+        }else if((props.playlist as SpotifyApi.SavedTrackObject[])[0]?.track !== undefined){
             tracks = (props.playlist as SpotifyApi.SavedTrackObject[]).map((savedTrack) => savedTrack.track);
         } else {
             tracks = (props.playlist as SpotifyApi.SavedEpisodeObject[]).map((savedEpisode) => {
