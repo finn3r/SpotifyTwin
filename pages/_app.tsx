@@ -3,7 +3,6 @@ import type {AppProps} from 'next/app'
 import {SessionProvider} from 'next-auth/react'
 import {RecoilRoot} from "recoil";
 import SideBar from "../components/SideBar";
-import Player from "../components/Player";
 import React from "react";
 import AccountButton from "../components/AccountButton";
 
@@ -18,7 +17,7 @@ function MyApp({Component, pageProps: {session, ...pageProps}}: AppProps) {
                         <Component {...pageProps} />
                     </main>
                     <div className={"absolute w-screen bottom-0"}>
-                        <Player/>
+                        {/*<Player/>*/}
                     </div>
                 </div>
             </RecoilRoot>

@@ -100,8 +100,8 @@ const Player = () => {
                     updateTime: performance.now()
                 });
             })
-            player.connect().catch(() => {
-                /*const script_two = document.createElement("script");
+            /*player.connect().catch(() => {
+                /!*const script_two = document.createElement("script");
                 script_two.src = "https://open.spotify.com/embed-podcast/iframe-api/v1";
                 script_two.async = true;
 
@@ -114,8 +114,8 @@ const Player = () => {
                     };
                     let callback = (EmbedController) => {};
                     IFrameAPI.createController(element, options, callback);
-                };*/
-            });
+                };*!/
+            });*/
         };
     }, []);
 
