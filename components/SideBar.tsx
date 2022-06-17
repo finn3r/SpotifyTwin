@@ -3,7 +3,6 @@ import {
     HomeIcon,
     LibraryIcon,
     PlusCircleIcon,
-    RssIcon,
     SearchIcon
 } from "@heroicons/react/outline";
 import {useSession} from "next-auth/react";
@@ -67,10 +66,6 @@ const SideBar = () => {
                 <button className={`flex items-center space-x-2 hover:text-white ${("/collection/tracks" == path) ? "text-white" : ""}`} onClick={() => router.push('/collection/tracks')}>
                     <HeartIcon className="h-5 w-5"/>
                     <p>Liked Songs</p>
-                </button>
-                <button className={`flex items-center space-x-2 hover:text-white ${("/collection/episodes" == path) ? "text-white" : ""}`} onClick={() => router.push(`/collection/episodes`)}>
-                    <RssIcon className="h-5 w-5"/>
-                    <p>Your episodes</p>
                 </button>
                 <hr className={"border-t-[0.1px] border-gray-900"}/>
                 {/*Playlists*/}

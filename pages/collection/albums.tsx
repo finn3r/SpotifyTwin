@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import Collection from "../../components/Collection";
 import {useSession} from "next-auth/react";
 import useSpotify from "../../hooks/useSpotify";
-import CollectionCell from "../../components/CollectionCell";
+import Cell from "../../components/Collection/Cell";
 
 const Albums = () => {
     const {data: session} = useSession();
@@ -28,7 +28,7 @@ const Albums = () => {
 
     return (
         <Collection>
-            {albums?.map((album) => <CollectionCell key={album.album.id + "_cell"} collection={album.album}/>)}
+            {albums?.map((album) => <Cell key={album.album.id + "_cell"} collection={album.album}/>)}
         </Collection>
     );
 };

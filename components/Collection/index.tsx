@@ -22,8 +22,6 @@ const Collection: React.FC = ({children}) => {
             <header className={"flex flex-row space-x-4 text-white text-xl md:text-2xl xl:text-3xl font-bold m-5"}>
                 <p className={`rounded-xl p-2 hover:cursor-pointer ${(path.includes("playlists")) ? "bg-[#2a2a2a]" : ""}`}
                    onClick={() => router.push("/collection/playlists")}>Playlists</p>
-                <p className={`rounded-xl p-2 hover:cursor-pointer ${(path.includes("podcasts")) ? "bg-[#2a2a2a]" : ""}`}
-                   onClick={() => router.push("/collection/podcasts")}>Podcasts</p>
                 <p className={`rounded-xl p-2 hover:cursor-pointer ${(path.includes("artists")) ? "bg-[#2a2a2a]" : ""}`}
                    onClick={() => router.push("/collection/artists")}>Artists</p>
                 <p className={`rounded-xl p-2 hover:cursor-pointer ${(path.includes("albums")) ? "bg-[#2a2a2a]" : ""}`}

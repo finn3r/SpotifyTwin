@@ -1,9 +1,9 @@
 import React from 'react';
-import {millisToMinutesAndSeconds} from "../lib/time";
+import {millisToMinutesAndSeconds} from "../../lib/time";
 import {useRecoilValue} from "recoil";
-import useSpotify from "../hooks/useSpotify";
-import {deviceAtom} from "../Atoms/deviceAtom";
-import {currentTrackState, isPlayingState} from "../Atoms/songAtom";
+import useSpotify from "../../hooks/useSpotify";
+import {deviceAtom} from "../../Atoms/deviceAtom";
+import {currentTrackState, isPlayingState} from "../../Atoms/songAtom";
 
 const Song = (props: { track: SpotifyApi.TrackObjectFull , order: number, playlistUri: string }) => {
     const spotifyApi = useSpotify();

@@ -6,7 +6,7 @@ function cutTags(str: string) {
     return str.replace(regex, " ");
 }
 
-const CollectionCell = (props: { collection: SpotifyApi.PlaylistObjectSimplified | SpotifyApi.ShowObjectSimplified | SpotifyApi.AlbumObjectSimplified | SpotifyApi.ArtistObjectFull }) => {
+const Cell = (props: { collection: SpotifyApi.PlaylistObjectSimplified | SpotifyApi.ShowObjectSimplified | SpotifyApi.AlbumObjectSimplified | SpotifyApi.ArtistObjectFull }) => {
     const router = useRouter();
     const image: string = props.collection.images?.[0]?.url;
     const name: string = props.collection.name;
@@ -39,8 +39,7 @@ const CollectionCell = (props: { collection: SpotifyApi.PlaylistObjectSimplified
                     <img alt={""} src={image} loading="lazy"
                          className={"object-cover w-full h-full absolute top-0 left-0 rounded-md"}/> :
                     <svg viewBox="-20 -25 100 100"
-                         className="bg-[#2a2a2a] rounded-md w-full h-full absolute top-0 left-0" aria-hidden="true"
-                         data-testid="card-image-fallback">
+                         className="bg-[#2a2a2a] rounded-md w-full h-full absolute top-0 left-0" aria-hidden="true">
                         <path
                             d="M16 7.494v28.362A8.986 8.986 0 0 0 9 32.5c-4.962 0-9 4.038-9 9s4.038 9 9 9 9-4.038 9-9V9.113l30-6.378v27.031a8.983 8.983 0 0 0-7-3.356c-4.962 0-9 4.038-9 9 0 4.963 4.038 9 9 9s9-4.037 9-9V.266L16 7.494zM9 48.5c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7c0 3.859-3.141 7-7 7zm32-6.09c-3.86 0-7-3.14-7-7 0-3.859 3.14-7 7-7s7 3.141 7 7c0 3.861-3.141 7-7 7z"
                             fill="currentColor" fillRule="evenodd"/>
@@ -52,4 +51,4 @@ const CollectionCell = (props: { collection: SpotifyApi.PlaylistObjectSimplified
     );
 };
 
-export default CollectionCell;
+export default Cell;

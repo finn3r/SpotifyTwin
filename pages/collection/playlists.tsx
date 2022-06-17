@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import CollectionCell from "../../components/CollectionCell";
+import Cell from "../../components/Collection/Cell";
 import useSpotify from "../../hooks/useSpotify";
 import {useSession} from "next-auth/react";
 import {useRecoilValue} from "recoil";
@@ -15,7 +15,7 @@ const Playlists = () => {
     const [savedTracks, setSavedTracks] = useState<{ info: string, count: number }>();
 
     const getTracks = async () => {
-        spotifyApi.getMySavedTracks({limit:10}).then((data) => {
+        spotifyApi.getMySavedTracks({limit: 10}).then((data) => {
             let info: string = "";
             for (let i = 0; i < data.body.items.length; i++) info += data.body.items[i].track.artists[0].name + " - " + data.body.items[i].track.name + " • ";
             setSavedTracks({
@@ -23,7 +23,7 @@ const Playlists = () => {
                 count: data.body.total
             })
         })
-    }
+    };
 
     useEffect(() => {
         if (spotifyApi.getAccessToken()) {
@@ -33,6 +33,7 @@ const Playlists = () => {
 
     return (
         <Collection>
+            {/*SAVED TRACKS*/}
             <div
                 className={"saved_collection"}
                 onClick={() => router.push(`/collection/tracks`)}
@@ -58,7 +59,7 @@ const Playlists = () => {
                     <p className={"text-gray-400 font-bold m-2"}>{savedTracks?.count} saved tracks</p>
                 </div>
             </div>
-            {playlists?.map((playlist) => <CollectionCell key={playlist.id + "_cell"} collection={playlist}/>)}
+            {playlists?.map((playlist) => <Cell key={playlist.id + "_cell"} collection={playlist}/>)}
         </Collection>
     );
 };
