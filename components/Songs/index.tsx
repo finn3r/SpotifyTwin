@@ -2,28 +2,14 @@ import React from 'react';
 import Song from "./Song";
 import {isArray} from "lodash";
 
-const Songs = (props: { playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.TrackObjectFull[] | SpotifyApi.SavedTrackObject[] | SpotifyApi.AlbumObjectFull | SpotifyApi.ShowObject | SpotifyApi.SavedEpisodeObject[] | undefined }) => {
+const Songs = (props: { playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.TrackObjectFull[] | SpotifyApi.SavedTrackObject[] | SpotifyApi.AlbumObjectFull | undefined }) => {
     let playlistUri: string = "";
     let tracks: SpotifyApi.TrackObjectFull[];
     if (isArray(props.playlist)) {
-        if((props.playlist as SpotifyApi.TrackObjectFull[])[0]?.name !== undefined){
+        if ((props.playlist as SpotifyApi.TrackObjectFull[])[0]?.name !== undefined) {
             tracks = props.playlist as SpotifyApi.TrackObjectFull[];
-        }else if((props.playlist as SpotifyApi.SavedTrackObject[])[0]?.track !== undefined){
+        } else if ((props.playlist as SpotifyApi.SavedTrackObject[])[0]?.track !== undefined) {
             tracks = (props.playlist as SpotifyApi.SavedTrackObject[]).map((savedTrack) => savedTrack.track);
-        } else {
-            tracks = (props.playlist as SpotifyApi.SavedEpisodeObject[]).map((savedEpisode) => {
-                const author: SpotifyApi.ArtistObjectSimplified = {
-                    name: savedEpisode.episode.show.publisher,
-                    id: "",
-                    type: "artist",
-                    href: "",
-                    uri: "",
-                    external_urls: {spotify: ""}
-                };
-                const track: SpotifyApi.TrackObjectFull = savedEpisode.episode as unknown as SpotifyApi.TrackObjectFull;
-                track.artists = [author];
-                return track;
-            });
         }
     } else {
         switch (props.playlist?.type) {
@@ -34,22 +20,7 @@ const Songs = (props: { playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.Tra
             }
             case "album": {
                 tracks = props.playlist.tracks.items as SpotifyApi.TrackObjectFull[];
-                break;
-            }
-            case "show": {
-                const author: SpotifyApi.ArtistObjectSimplified = {
-                    name: props.playlist.publisher,
-                    id: "",
-                    type: "artist",
-                    href: "",
-                    uri: "",
-                    external_urls: {spotify: ""}
-                };
-                tracks = props.playlist.episodes.items.map((showTrack) => {
-                    const track: SpotifyApi.TrackObjectFull = showTrack as unknown as SpotifyApi.TrackObjectFull;
-                    track.artists = [author];
-                    return track;
-                });
+                playlistUri = props.playlist.uri;
                 break;
             }
             default: {
