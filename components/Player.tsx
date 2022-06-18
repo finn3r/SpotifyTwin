@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import useSpotify from "../hooks/useSpotify";
 import {useRecoilState} from "recoil";
 import {currentTrackState, isPlayingState} from "../Atoms/songAtom";
-import {useSession} from "next-auth/react";
 import {
     FastForwardIcon,
     PauseIcon,
@@ -12,16 +11,17 @@ import {
     SwitchHorizontalIcon
 } from "@heroicons/react/solid";
 import {VolumeUpIcon, VolumeOffIcon} from "@heroicons/react/outline";
-import {deviceAtom} from "../Atoms/deviceAtom";
+import {playerAtom} from "../Atoms/playerAtom";
 import Slider from "./Slider";
+import {deviceAtom} from "../Atoms/deviceAtom";
 
 const Player = () => {
     const spotifyApi = useSpotify();
-    const {data: session} = useSession();
+    const [statusVisible, setStatusVisible] = useState(true);
     const [currentTrack, setCurrentTrack] = useRecoilState(currentTrackState);
     const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
-    const [,setDevice] = useRecoilState(deviceAtom);
-    const [player, setPlayer] = useState<Spotify.Player>();
+    const [player, setPlayer] = useRecoilState(playerAtom);
+    const [, setDevice] = useRecoilState(deviceAtom);
     const [volume, setVolume] = useState({
         value: 0.5,
         isOff: false
@@ -45,7 +45,8 @@ const Player = () => {
     }, [currentTrack?.id])
 
     useEffect(() => {
-        if (!isPlaying) return () => {};
+        if (!isPlaying) return () => {
+        };
         const interval = setInterval(() => {
             const progress = (trackState !== undefined) ? (trackState.position + performance.now() - trackState.updateTime) / 1000 : 0;
             setProgress(progress);
@@ -54,71 +55,66 @@ const Player = () => {
     }, [trackState, isPlaying]);
 
     useEffect(() => {
-        const script = document.createElement("script");
-        script.src = "https://sdk.scdn.co/spotify-player.js";
-        script.async = true;
-        document.body.appendChild(script);
-        window.onSpotifyWebPlaybackSDKReady = () => {
-            const lastVolume: number = localStorage.getItem("volume") ? JSON.parse(localStorage.getItem("volume")!) : 0.5;
-            setVolume({
-                ...volume,
-                value: lastVolume
-            });
-            const player = new window.Spotify.Player({
-                name: 'Finner-spotify',
-                getOAuthToken: cb => {
-                    cb(session?.user.accessToken!);
-                },
-                volume: lastVolume,
-            });
-            player.addListener('ready', ({device_id}) => {
-                setDevice(device_id);
-                setPlayer(player);
-                console.log('Ready with Device ID', device_id);
-                spotifyApi.getMyRecentlyPlayedTracks().then((data) => {
-                    spotifyApi.play({
-                        device_id: device_id,
-                        context_uri: data.body.items[0].context.uri,
-                        offset: {
-                            uri: data.body.items[0].track.uri
-                        }
-                    }).then(() => {
-                        player.pause().then();
+        const token = spotifyApi.getAccessToken();
+
+        const getPlayer = async (token: string) => {
+            const status = await spotifyApi.getMe().then((data) => data.body.product === "premium");
+            if (status) {
+                const script = document.createElement("script");
+                script.src = "https://sdk.scdn.co/spotify-player.js";
+                script.async = true;
+                document.body.appendChild(script);
+                window.onSpotifyWebPlaybackSDKReady = () => {
+                    const lastVolume: number = localStorage.getItem("volume") ? JSON.parse(localStorage.getItem("volume")!) : 0.5;
+                    setVolume({
+                        ...volume,
+                        value: lastVolume
                     });
-                });
-            });
-            player.addListener('not_ready', ({device_id}) => {
-                setDevice("");
-                console.log('Device ID has gone offline', device_id);
-            });
-            player.addListener('player_state_changed', (props) => {
-                setCurrentTrack(props?.track_window?.current_track);
-                setIsPlaying(!props?.paused);
-                setTrackState({
-                    duration: props?.duration ?? 0,
-                    position: props?.position ?? 0,
-                    updateTime: performance.now()
-                });
-            })
-            /*player.connect().catch(() => {
-                /!*const script_two = document.createElement("script");
-                script_two.src = "https://open.spotify.com/embed-podcast/iframe-api/v1";
-                script_two.async = true;
+                    const player = new window.Spotify.Player({
+                        name: 'Finner-spotify',
+                        getOAuthToken: cb => {
+                            cb(token);
+                        },
+                        volume: lastVolume,
+                    });
+                    player.addListener('ready', ({device_id}) => {
+                        setDevice(device_id);
+                        setPlayer(player);
+                        console.log('Ready with Device ID', device_id);
+                        setStatusVisible(true);
+                    });
+                    player.addListener('not_ready', ({device_id}) => {
+                        setDevice("");
+                        console.log('Device ID has gone offline', device_id);
+                    });
+                    player.addListener('player_state_changed', (props) => {
+                        setCurrentTrack(props?.track_window?.current_track);
+                        setIsPlaying(!props?.paused);
+                        setTrackState({
+                            duration: props?.duration ?? 0,
+                            position: props?.position ?? 0,
+                            updateTime: performance.now()
+                        });
+                    })
+                    player.connect().catch((e) => {
+                        console.log(e);
+                    });
+                };
+                return () => {
+                    player?.disconnect();
+                    document.body.removeChild(script);
+                };
+            } else {
+                console.log("Sorry player available only on premium spotify account.")
+                setStatusVisible(false);
+            }
+        }
+        if (token) {
+            getPlayer(token).then();
+        }
+    }, [spotifyApi.getAccessToken()]);
 
-                document.body.appendChild(script_two);
-
-                window.onSpotifyIframeApiReady = (IFrameAPI) => {
-                    let element = document.getElementById('test');
-                    let options = {
-                        uri: 'spotify:episode:7makk4oTQel546B0PZlDM5'
-                    };
-                    let callback = (EmbedController) => {};
-                    IFrameAPI.createController(element, options, callback);
-                };*!/
-            });*/
-        };
-    }, []);
-
+    if (!statusVisible) return null;
     return (
         <div>
             {/*TrackLine*/}
@@ -126,11 +122,11 @@ const Player = () => {
                 <Slider
                     value={inputActive ? inputValue : progress}
                     min={0}
-                    max={trackState.duration/1000}
+                    max={trackState.duration / 1000}
                     step={0.001}
                     onChange={(e, value) => {
                         const currValue = Array.isArray(value) ? value[0] : value;
-                        player?.seek(currValue*1000).then(() =>{
+                        player?.seek(currValue * 1000).then(() => {
                             setProgress(currValue);
                             setInputValue(currValue);
                         });
@@ -139,7 +135,7 @@ const Player = () => {
                     onMouseUp={() => {
                         setInputActive(false);
                         setProgress(inputValue);
-                        if(inputValue !== progress)player?.seek(inputValue*1000).then(() => {
+                        if (inputValue !== progress) player?.seek(inputValue * 1000).then(() => {
                             setInputActive(false);
                             setProgress(inputValue);
                         });

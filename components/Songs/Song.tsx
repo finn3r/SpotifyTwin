@@ -2,36 +2,59 @@ import React from 'react';
 import {millisToMinutesAndSeconds} from "../../lib/time";
 import {useRecoilValue} from "recoil";
 import useSpotify from "../../hooks/useSpotify";
-import {deviceAtom} from "../../Atoms/deviceAtom";
+import {playerAtom} from "../../Atoms/playerAtom";
 import {currentTrackState, isPlayingState} from "../../Atoms/songAtom";
+import {deviceAtom} from "../../Atoms/deviceAtom";
 
-const Song = (props: { track: SpotifyApi.TrackObjectFull , order: number, playlistUri: string }) => {
+const Song = (props: { track: SpotifyApi.TrackObjectFull, order: number, playlistUri: string, uris: string[] }) => {
     const spotifyApi = useSpotify();
+    const player = useRecoilValue(playerAtom);
     const device = useRecoilValue(deviceAtom);
     const currentTrack = useRecoilValue(currentTrackState);
     const isPlaying = useRecoilValue(isPlayingState);
 
-    const playSong = () => {
-        if (device!=="") spotifyApi.play({
-            device_id: device,
-            context_uri: props.playlistUri,
-            offset: {
-                uri: props.track.uri
+    const handleClick = () => {
+        if ((player)&&(device)) {
+            if ((isPlaying) && (currentTrack?.id === props.track.id)) {
+                player.pause().then().catch(() => console.log("Too much clicks"));
+            } else if (currentTrack?.id === props.track.id) {
+                player.resume().then().catch(() => console.log("Too much clicks"));
+            } else {
+                let options;
+                if(props.playlistUri!==""){
+                    options = {
+                        device_id: device,
+                        context_uri: props.playlistUri,
+                        offset: {
+                            uri: props.track.uri
+                        }
+                    }
+                } else {
+                    options = {
+                        device_id: device,
+                        uris: props.uris,
+                        offset: {
+                            position: props.order
+                        }
+                    }
+                }
+                spotifyApi.play(options).then().catch(() => console.log("Too much clicks"));
             }
-        }).then();
+        }
     }
 
     return (
         <div
             className={"grid grid-cols-2 text-gray-500 py-4 px-4 hover:bg-gray-900 hover:bg-opacity-60 rounded-lg cursor-pointer z-[5]"}
-            onClick={playSong}
+            onClick={handleClick}
         >
             <div className={"flex items-center space-x-4"}>
                 <div
                     className={"h-6 w-4 " + (currentTrack?.id === props.track.id ? "text-green-600" : "")}
                 >
-                    {((currentTrack?.id === props.track.id)&&isPlaying) ?
-                        <img loading={"lazy"} src={"https://open.scdn.co/cdn/images/equaliser-animated-green.f93a2ef4.gif"} alt={""}/>
+                    {((currentTrack?.id === props.track.id) && isPlaying) ?
+                        <img loading={"lazy"}
+                             src={"https://open.scdn.co/cdn/images/equaliser-animated-green.f93a2ef4.gif"} alt={""}/>
                         :
                         (props.order + 1)
                     }

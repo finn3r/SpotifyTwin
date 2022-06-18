@@ -4,7 +4,7 @@ import {isArray} from "lodash";
 
 const Songs = (props: { playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.TrackObjectFull[] | SpotifyApi.SavedTrackObject[] | SpotifyApi.AlbumObjectFull | undefined }) => {
     let playlistUri: string = "";
-    let tracks: SpotifyApi.TrackObjectFull[];
+    let tracks: SpotifyApi.TrackObjectFull[] = [];
     if (isArray(props.playlist)) {
         if ((props.playlist as SpotifyApi.TrackObjectFull[])[0]?.name !== undefined) {
             tracks = props.playlist as SpotifyApi.TrackObjectFull[];
@@ -23,17 +23,14 @@ const Songs = (props: { playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.Tra
                 playlistUri = props.playlist.uri;
                 break;
             }
-            default: {
-                tracks = [];
-                break;
-            }
         }
     }
+    let uris = tracks.map((track) => track.uri);
     return (
         <div className={"flex flex-col text-white space-y-1"}>
             {(tracks?.length > 0) ?
                 tracks.map((track, i) => (
-                    <Song key={track.id} track={track} order={i} playlistUri={playlistUri}/>
+                    <Song key={track.id} track={track} order={i} playlistUri={playlistUri} uris={uris}/>
                 ))
                 :
                 <div className={"absolute top-0 w-full min-h-0 h-screen bg-[#121212]"}/>
