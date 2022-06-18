@@ -14,30 +14,32 @@ const Playlist: NextPage = () => {
         error: false
     });
     useEffect(() => {
-        const {id} = router.query;
-        setPlaylist({
-            ...playlist,
-            error: false
-        });
-        if ((typeof id === "string") && (id != playlist.id)) {
-            spotifyApi
-                .getPlaylist(id)
-                .then((data) => {
-                    setPlaylist({
-                        ...playlist,
-                        info: data.body,
-                        id: id
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
-                    setPlaylist({
-                        ...playlist,
-                        error: true
-                    });
-                })
+        if (spotifyApi.getAccessToken()) {
+            const {id} = router.query;
+            setPlaylist({
+                ...playlist,
+                error: false
+            });
+            if ((typeof id === "string") && (id != playlist.id)) {
+                spotifyApi
+                    .getPlaylist(id)
+                    .then((data) => {
+                        setPlaylist({
+                            ...playlist,
+                            info: data.body,
+                            id: id
+                        });
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        setPlaylist({
+                            ...playlist,
+                            error: true
+                        });
+                    })
+            }
         }
-    }, [router]);
+    }, [router, spotifyApi]);
 
     return (
         <AudioPage type={"playlist"} error={playlist.error} info={playlist.info}>

@@ -4,7 +4,7 @@ import {useRouter} from "next/router";
 import AudioPage from "../../components/AudioPage";
 import Songs from "../../components/Songs";
 import ArtistAlbums from "../../components/ArtistAlbums";
-import CollectionCell from "../../components/CollectionCell";
+import CollectionCell from "../../components/Collection/Cell";
 
 const Artist = () => {
     const spotifyApi = useSpotify();
