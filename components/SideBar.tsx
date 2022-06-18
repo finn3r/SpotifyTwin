@@ -1,10 +1,4 @@
-import {
-    HeartIcon,
-    HomeIcon,
-    LibraryIcon,
-    PlusCircleIcon,
-    SearchIcon
-} from "@heroicons/react/outline";
+import {HomeIcon, LibraryIcon, SearchIcon} from "@heroicons/react/outline";
 import {useSession} from "next-auth/react";
 import {useEffect} from "react";
 import useSpotify from "../hooks/useSpotify";
@@ -58,18 +52,8 @@ const SideBar = () => {
                     <p>Your Library</p>
                 </button>
                 <hr className={"border-t-[0.1px] border-gray-900"}/>
-
-                <button className="flex items-center space-x-2 hover:text-white">
-                    <PlusCircleIcon className="h-5 w-5"/>
-                    <p>Create Playlist</p>
-                </button>
-                <button className={`flex items-center space-x-2 hover:text-white ${("/collection/tracks" == path) ? "text-white" : ""}`} onClick={() => router.push('/collection/tracks')}>
-                    <HeartIcon className="h-5 w-5"/>
-                    <p>Liked Songs</p>
-                </button>
-                <hr className={"border-t-[0.1px] border-gray-900"}/>
                 {/*Playlists*/}
-                <div className={"h-[70vh] overflow-y-scroll scrollbar-hide pb-20"}>
+                <div className={"h-[80vh] overflow-y-scroll scrollbar-hide pb-20"}>
                 {playlists.map((playlist) => (
                     <p
                         key={playlist.id}
