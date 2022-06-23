@@ -39,6 +39,54 @@ const Player = () => {
         (!volume.isOff) ? player?.setVolume(0) : player?.setVolume(volume.value);
     };
 
+    const getPlayer = async (token: string) => {
+        const status = await spotifyApi.getMe().then((data) => data.body.product === "premium");
+        if (status) {
+            const script = document.createElement("script");
+            script.src = "https://sdk.scdn.co/spotify-player.js";
+            script.async = true;
+            document.body.appendChild(script);
+            window.onSpotifyWebPlaybackSDKReady = () => {
+                const lastVolume: number = localStorage.getItem("volume") ? JSON.parse(localStorage.getItem("volume")!) : 0.5;
+                setVolume({
+                    ...volume,
+                    value: lastVolume
+                });
+                const player = new window.Spotify.Player({
+                    name: 'Finner-spotify',
+                    getOAuthToken: cb => {
+                        cb(token);
+                    },
+                    volume: lastVolume,
+                });
+                player.addListener('ready', ({device_id}) => {
+                    setDevice(device_id);
+                    setPlayer(player);
+                    setStatusVisible(true);
+                });
+                player.addListener('not_ready', () => {
+                    setDevice("");
+                });
+                player.addListener('player_state_changed', (props) => {
+                    setCurrentTrack(props?.track_window?.current_track);
+                    setIsPlaying(!props?.paused);
+                    setTrackState({
+                        duration: props?.duration ?? 0,
+                        position: props?.position ?? 0,
+                        updateTime: performance.now()
+                    });
+                })
+                player.connect().catch((e) => {
+                    console.log(e);
+                });
+            };
+            return script;
+        } else {
+            console.log("Sorry player available only on premium spotify account.")
+            setStatusVisible(false);
+        }
+    };
+
     useEffect(() => {
         setInputValue(0);
         setProgress(0);
@@ -56,61 +104,17 @@ const Player = () => {
 
     useEffect(() => {
         const token = spotifyApi.getAccessToken();
-
-        const getPlayer = async (token: string) => {
-            const status = await spotifyApi.getMe().then((data) => data.body.product === "premium");
-            if (status) {
-                const script = document.createElement("script");
-                script.src = "https://sdk.scdn.co/spotify-player.js";
-                script.async = true;
-                document.body.appendChild(script);
-                window.onSpotifyWebPlaybackSDKReady = () => {
-                    const lastVolume: number = localStorage.getItem("volume") ? JSON.parse(localStorage.getItem("volume")!) : 0.5;
-                    setVolume({
-                        ...volume,
-                        value: lastVolume
-                    });
-                    const player = new window.Spotify.Player({
-                        name: 'Finner-spotify',
-                        getOAuthToken: cb => {
-                            cb(token);
-                        },
-                        volume: lastVolume,
-                    });
-                    player.addListener('ready', ({device_id}) => {
-                        setDevice(device_id);
-                        setPlayer(player);
-                        console.log('Ready with Device ID', device_id);
-                        setStatusVisible(true);
-                    });
-                    player.addListener('not_ready', ({device_id}) => {
-                        setDevice("");
-                        console.log('Device ID has gone offline', device_id);
-                    });
-                    player.addListener('player_state_changed', (props) => {
-                        setCurrentTrack(props?.track_window?.current_track);
-                        setIsPlaying(!props?.paused);
-                        setTrackState({
-                            duration: props?.duration ?? 0,
-                            position: props?.position ?? 0,
-                            updateTime: performance.now()
-                        });
-                    })
-                    player.connect().catch((e) => {
-                        console.log(e);
-                    });
-                };
-                return () => {
-                    player?.disconnect();
-                    document.body.removeChild(script);
-                };
-            } else {
-                console.log("Sorry player available only on premium spotify account.")
-                setStatusVisible(false);
-            }
-        }
+        let scriptPromise: Promise<HTMLScriptElement | undefined>;
         if (token) {
-            getPlayer(token).then();
+            scriptPromise = getPlayer(token).then();
+        }
+        return () => {
+            (async () => {
+                const script = await scriptPromise;
+                player?.disconnect();
+                player?.removeListener("ready");
+                if(script)document.body.removeChild(script);
+            })();
         }
     }, [spotifyApi.getAccessToken()]);
 
