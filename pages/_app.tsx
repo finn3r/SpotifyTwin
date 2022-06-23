@@ -6,11 +6,13 @@ import SideBar from "../components/SideBar";
 import React from "react";
 import AccountButton from "../components/AccountButton";
 import Player from "../components/Player";
+import HeadTitle from "../components/HeadTitle";
 
 function MyApp({Component, pageProps: {session, ...pageProps}}: AppProps) {
     return (
         <SessionProvider session={session}>
             <RecoilRoot>
+                <HeadTitle/>
                 <div className={"bg-black h-screen overflow-hidden min-w-[400px]"}>
                     <AccountButton/>
                     <main className={"flex"}>

@@ -5,8 +5,11 @@ import AudioPage from "../../components/AudioPage";
 import Songs from "../../components/Songs";
 import ArtistAlbums from "../../components/ArtistAlbums";
 import CollectionCell from "../../components/Collection/Cell";
+import {useRecoilState} from "recoil";
+import {titleAtom} from "../../Atoms/titleAtom";
 
 const Artist = () => {
+    const [, setTitle] = useRecoilState(titleAtom);
     const spotifyApi = useSpotify();
     const router = useRouter();
     const [artist, setArtist] = useState<{ id: string, info: undefined | SpotifyApi.SingleArtistResponse, error: boolean, topTracks: SpotifyApi.TrackObjectFull[], albums: SpotifyApi.AlbumObjectSimplified[] }>({
@@ -17,28 +20,45 @@ const Artist = () => {
         albums: []
     });
 
-    const getAlbums = async (id: string, offset: number, tracks: SpotifyApi.TrackObjectFull[], info:SpotifyApi.SingleArtistResponse, albums?: SpotifyApi.AlbumObjectSimplified[]) => {
-        spotifyApi.getArtistAlbums(id, {offset: offset, limit: 50}).then((data) => {
-            if (data.body.next) {
-                const offset: number = Number(data.body.next.split("offset=")[1].split("&")[0]);
-                getAlbums(id, offset,tracks,info, [...albums ?? [], ...data.body.items]);
-            } else {
-                setArtist({
-                    ...artist,
-                    topTracks: tracks,
-                    info: info,
-                    id: id,
-                    albums: [...albums ?? [], ...data.body.items]
-                })
-            }
-        })
+    const getArtistAlbums = async (id: string) => {
+        let fetching = true;
+        let offset = 0;
+        const albums: SpotifyApi.AlbumObjectSimplified[] = [];
+        do {
+            const newAlbums = await spotifyApi.getArtistAlbums(id, {offset, limit: 50}).then(data => data.body);
+            albums.push(...newAlbums.items);
+            if (newAlbums.next) {
+                offset = Number(newAlbums.next.split("offset=")[1].split("&")[0]);
+            } else fetching = false;
+        } while (fetching);
+        return albums
     };
 
-    const getTopTracks = async (id: string) => {
-        return spotifyApi.getMe().then((data) => spotifyApi.getArtistTopTracks(id, data.body.country).then((data) => {
-            return data.body.tracks
-        }))
+    const getArtist = async (id: string) => {
+        try {
+            const profileCountry = await spotifyApi.getMe().then(data => data.body.country);
+            const info = await spotifyApi.getArtist(id).then(data => data.body);
+            const albums = await getArtistAlbums(id);
+            const topTracks = await spotifyApi.getArtistTopTracks(id, profileCountry).then(data => data.body.tracks);
+            setArtist({
+                ...artist,
+                topTracks,
+                info,
+                id,
+                albums
+            });
+        } catch (e) {
+            console.log(e);
+            setArtist({
+                ...artist,
+                error: true
+            });
+        }
     };
+
+    useEffect(() => {
+        setTitle(artist.info?.name ? (artist.info?.name + " - Artist - Spotify tween") : "Spotify tween");
+    }, [artist.info]);
 
     useEffect(() => {
         if (spotifyApi.getAccessToken()) {
@@ -48,23 +68,11 @@ const Artist = () => {
                 error: false
             });
             if ((typeof id === "string") && (id != artist.id)) {
-                spotifyApi
-                    .getArtist(id)
-                    .then((data) => {
-                        getTopTracks(data.body.id).then((tracks) => {
-                            getAlbums(data.body.id, 0, tracks, data.body).then();
-                        })
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        setArtist({
-                            ...artist,
-                            error: true
-                        });
-                    })
+                getArtist(id).then();
             }
         }
-    }, [router, spotifyApi])
+    }, [router, spotifyApi]);
+
     return (
         (artist.info) ? <AudioPage info={artist.info} error={artist.error} type={"artist"}>
             <div className={"flex flex-col text-white space-y-1"}>

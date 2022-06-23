@@ -8,12 +8,12 @@ function cutTags(str: string) {
 
 const Cell = (props: { collection: SpotifyApi.PlaylistObjectSimplified | SpotifyApi.ShowObjectSimplified | SpotifyApi.AlbumObjectSimplified | SpotifyApi.ArtistObjectFull }) => {
     const router = useRouter();
-    const image: string = props.collection.images?.[0]?.url;
-    const name: string = props.collection.name;
+    const image: string = props.collection?.images?.[0]?.url;
+    const name: string = props.collection?.name;
     let description: string = "";
-    switch(props.collection.type) {
+    switch(props.collection?.type) {
         case "album": {
-            for(let i=0;i<props.collection.artists.length;i++)description = props.collection.artists[i].name + ', ';
+            for(let i=0;i<props.collection.artists.length;i++)description = props.collection?.artists[i].name + ', ';
             description = description.slice(0,-2);
             break;
         }

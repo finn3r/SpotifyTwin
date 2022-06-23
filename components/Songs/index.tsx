@@ -1,10 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Song from "./Song";
 import {isArray} from "lodash";
 
 const Songs = (props: { playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.TrackObjectFull[] | SpotifyApi.SavedTrackObject[] | SpotifyApi.AlbumObjectFull | undefined }) => {
     let playlistUri: string = "";
     let tracks: SpotifyApi.TrackObjectFull[] = [];
+    const [isFetching, setIsFetching] = useState(false);
+
     if (isArray(props.playlist)) {
         if ((props.playlist as SpotifyApi.TrackObjectFull[])[0]?.name !== undefined) {
             tracks = props.playlist as SpotifyApi.TrackObjectFull[];
@@ -25,17 +27,17 @@ const Songs = (props: { playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.Tra
             }
         }
     }
-    let uris = tracks.map((track) => track.uri);
+    const uris = tracks.map((track) => track.uri);
+
     return (
         <div className={"flex flex-col text-white space-y-1"}>
             {(tracks?.length > 0) ?
                 tracks.map((track, i) => (
-                    <Song key={track.id} track={track} order={i} playlistUri={playlistUri} uris={uris}/>
+                    <Song key={track.id} track={track} order={i} playlistUri={playlistUri} uris={uris} isFetching={isFetching} setIsFetching={setIsFetching}/>
                 ))
                 :
                 <div className={"absolute top-0 w-full min-h-0 h-screen bg-[#121212]"}/>
             }
-            <div className={"h-10"}/>
         </div>
     );
 };

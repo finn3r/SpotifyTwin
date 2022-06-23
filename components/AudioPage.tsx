@@ -14,11 +14,11 @@ const AudioPage: React.FC<AudioPageProps> = ({children, info, error, type}) => {
         info?.images?.[0]?.url ?
             new Vibrant(info.images[0].url).getPalette()
                 .then((palette) => setColor(palette.DarkVibrant!.hex))
-            : (type !== "episodes") ? setColor("#121212") : setColor("rgb(0, 100, 80)");
+            : setColor("#121212");
     }, [info]);
 
     return (
-        <div className={"h-screen overflow-y-scroll scrollbar-hide w-full relative bg-[#121212]"}>
+        <div id={"audio_container"} className={"h-screen overflow-y-scroll scrollbar-hide w-full relative bg-[#121212] pb-36"}>
             <div
                 className={`absolute z-[2] z-10 w-full h-[50vh] ${(error) ? "hidden" : ""}`}
                 style={{backgroundImage: `linear-gradient(to bottom, ${color}, #121212)`}}

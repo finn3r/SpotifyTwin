@@ -3,26 +3,36 @@ import Collection from "../../components/Collection";
 import {useSession} from "next-auth/react";
 import useSpotify from "../../hooks/useSpotify";
 import Cell from "../../components/Collection/Cell";
+import {useRecoilState} from "recoil";
+import {titleAtom} from "../../Atoms/titleAtom";
 
 const Artists = () => {
+    const [, setTitle] = useRecoilState(titleAtom);
     const {data: session} = useSession();
     const spotifyApi = useSpotify();
     const [artists, setArtists] = React.useState<SpotifyApi.ArtistObjectFull[]>();
 
-    const getArtists = async (after?: string, artists?: SpotifyApi.ArtistObjectFull[]) => {
-        spotifyApi.getFollowedArtists({after:after, limit: 1}).then((data) => {
-            if (data.body.artists.next) {
-                const after: string = data.body.artists.items[data.body.artists.items.length-1].id;
-                getArtists(after, [...artists??[],...data.body.artists.items]);
-            } else{
-                setArtists([...artists??[],...data.body.artists.items])
-            }
-        })
+    const getArtists = async () => {
+        let fetching = true;
+        let after = "0";
+        const artists: SpotifyApi.ArtistObjectFull[] = [];
+        do {
+            const newArtists = await spotifyApi.getFollowedArtists({after, limit: 50}).then(data => data.body.artists);
+            artists.push(...newArtists.items);
+            if (newArtists.next) {
+                after = newArtists.items[newArtists.items.length-1].id;
+            } else fetching = false;
+        } while (fetching);
+        return artists
     };
 
     useEffect(() => {
+        setTitle("Artists - Spotify tween");
+    },[]);
+
+    useEffect(() => {
         if (spotifyApi.getAccessToken()) {
-            getArtists().then();
+            getArtists().then(artists => setArtists(artists));
         }
     }, [session, spotifyApi]);
 

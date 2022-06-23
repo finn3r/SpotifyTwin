@@ -2,12 +2,14 @@ import React, {useEffect, useState} from 'react';
 import Cell from "../../components/Collection/Cell";
 import useSpotify from "../../hooks/useSpotify";
 import {useSession} from "next-auth/react";
-import {useRecoilValue} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {userPlaylistsState} from "../../Atoms/platlistAtom";
 import Collection from "../../components/Collection";
 import {useRouter} from "next/router";
+import {titleAtom} from "../../Atoms/titleAtom";
 
 const Playlists = () => {
+    const [, setTitle] = useRecoilState(titleAtom);
     const {data: session} = useSession();
     const spotifyApi = useSpotify();
     const router = useRouter();
@@ -15,15 +17,17 @@ const Playlists = () => {
     const [savedTracks, setSavedTracks] = useState<{ info: string, count: number }>();
 
     const getTracks = async () => {
-        spotifyApi.getMySavedTracks({limit: 10}).then((data) => {
-            let info: string = "";
-            for (let i = 0; i < data.body.items.length; i++) info += data.body.items[i].track.artists[0].name + " - " + data.body.items[i].track.name + " • ";
-            setSavedTracks({
-                info: info.slice(0, -3),
-                count: data.body.total
-            })
+        const savedTracks = await spotifyApi.getMySavedTracks({limit: 10}).then(data => data.body);
+        const savedTracksInfo = savedTracks.items.map(track => (track.track.artists[0].name + " - " + track.track.name)).join(" • ");
+        setSavedTracks({
+            info: savedTracksInfo,
+            count: savedTracks.total
         })
     };
+
+    useEffect(() => {
+        setTitle("Playlists - Spotify tween");
+    },[]);
 
     useEffect(() => {
         if (spotifyApi.getAccessToken()) {
