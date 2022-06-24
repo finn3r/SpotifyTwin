@@ -1,10 +1,12 @@
-import React, {useEffect} from 'react';
-import Collection from "../../components/Collection";
+import React, {lazy, useEffect, Suspense} from 'react';
 import {useSession} from "next-auth/react";
 import useSpotify from "../../hooks/useSpotify";
-import Cell from "../../components/Collection/Cell";
 import {useRecoilState} from "recoil";
 import {titleAtom} from "../../Atoms/titleAtom";
+import Spinner from "../../components/Spinner";
+
+const Cell = lazy(() => import("../../components/Collection/Cell"));
+const Collection = lazy(() => import("../../components/Collection"));
 
 const Albums = () => {
     const [, setTitle] = useRecoilState(titleAtom);
@@ -28,18 +30,20 @@ const Albums = () => {
 
     useEffect(() => {
         setTitle("Albums - Spotify tween");
-    },[]);
+    }, []);
 
     useEffect(() => {
         if (spotifyApi.getAccessToken()) {
             getAlbums().then(albums => setAlbums(albums));
         }
-    }, [session, spotifyApi]);
+    }, [session, spotifyApi.getAccessToken()]);
 
     return (
-        <Collection>
-            {albums?.map((album) => <Cell key={album.album.id + "_cell"} collection={album.album}/>)}
-        </Collection>
+        <Suspense fallback={<Spinner/>}>
+            <Collection>
+                {albums?.map((album) => <Cell key={album.album.id + "_cell"} collection={album.album}/>)}
+            </Collection>
+        </Suspense>
     );
 };
 

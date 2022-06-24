@@ -1,11 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, lazy, Suspense} from 'react';
 import useSpotify from "../../hooks/useSpotify";
-import Songs from "../../components/Songs";
 import {NextPage} from "next";
 import {useRouter} from "next/router";
-import AudioPage from "../../components/AudioPage";
 import {useRecoilState} from "recoil";
 import {titleAtom} from "../../Atoms/titleAtom";
+import Spinner from "../../components/Spinner";
+
+const AudioPage = lazy(() => import("../../components/AudioPage"));
+const Songs = lazy(() => import("../../components/Songs"));
 
 const Playlist: NextPage = () => {
     const [, setTitle] = useRecoilState(titleAtom);
@@ -53,12 +55,14 @@ const Playlist: NextPage = () => {
                 getPlaylists(id).then();
             }
         }
-    }, [spotifyApi, router]);
+    }, [spotifyApi.getAccessToken(), router]);
 
     return (
-        <AudioPage type={"playlist"} error={playlist.error} info={playlist.info}>
-            <Songs playlist={playlist.info}/>
-        </AudioPage>
+        <Suspense fallback={<Spinner/>}>
+            <AudioPage type={"playlist"} error={playlist.error} info={playlist.info}>
+                <Songs playlist={playlist.info}/>
+            </AudioPage>
+        </Suspense>
     );
 };
 

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import Vibrant from "node-vibrant";
+import Spinner from "./Spinner";
 
 interface AudioPageProps {
     info?: SpotifyApi.SingleAlbumResponse | SpotifyApi.SinglePlaylistResponse | SpotifyApi.SingleShowResponse | { images?: { url: string }[], name: string },
@@ -9,16 +10,26 @@ interface AudioPageProps {
 
 const AudioPage: React.FC<AudioPageProps> = ({children, info, error, type}) => {
     const [color, setColor] = useState<string>("");
+    const [fetching, setFetching] = useState(false);
 
     useEffect(() => {
-        info?.images?.[0]?.url ?
-            new Vibrant(info.images[0].url).getPalette()
-                .then((palette) => setColor(palette.DarkVibrant!.hex))
-            : setColor("#121212");
+        setFetching(true);
+        if(info?.images?.[0]?.url){
+            new Vibrant(info.images[0].url).getPalette().then((palette) => {
+                setColor(palette.DarkVibrant!.hex);
+                setFetching(false);
+            })
+        } else {
+            setColor("#121212");
+            setFetching(false);
+        }
     }, [info]);
 
+    if(fetching) return <Spinner/>
+
     return (
-        <div id={"audio_container"} className={"h-screen overflow-y-scroll scrollbar-hide w-full relative bg-[#121212] pb-36"}>
+        <div id={"audio_container"}
+             className={"h-screen overflow-y-scroll scrollbar-hide w-full relative bg-[#121212] pb-36"}>
             <div
                 className={`absolute z-[2] z-10 w-full h-[50vh] ${(error) ? "hidden" : ""}`}
                 style={{backgroundImage: `linear-gradient(to bottom, ${color}, #121212)`}}
@@ -36,9 +47,9 @@ const AudioPage: React.FC<AudioPageProps> = ({children, info, error, type}) => {
                         {info.images?.[0]?.url ? <img
                             src={info.images[0].url}
                             alt=""
-                            className={"z-[5] object-cover h-44 w-44 shadow-2xl"}
+                            className={"z-[5] object-cover h-44 w-44"}
                         /> : (type !== "episodes") ?
-                            <div className={"z-[5] h-44 w-44 shadow-2xl bg-[#808080]"}>
+                            <div className={"z-[5] h-44 w-44 bg-[#808080]"}>
                                 <svg viewBox="-20 -25 100 100"
                                      className="mb-2 min-h-0 basis-[80%] bg-[#2a2a2a]" aria-hidden="true"
                                      data-testid="card-image-fallback">
@@ -47,7 +58,7 @@ const AudioPage: React.FC<AudioPageProps> = ({children, info, error, type}) => {
                                         fill="currentColor" fillRule="evenodd"/>
                                 </svg>
                             </div> :
-                            <div className={"z-[5] h-44 w-44 shadow-2xl bg-[#006450] flex justify-center"}>
+                            <div className={"z-[5] h-44 w-44 bg-[#006450] flex justify-center"}>
                                 <svg role="img" viewBox="0 0 527 483" fill="none"
                                      xmlns="http://www.w3.org/2000/svg" className="w-[50%]">
                                     <path

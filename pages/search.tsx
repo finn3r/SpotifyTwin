@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {lazy, Suspense, useEffect, useState} from 'react';
 import useDebounce from "../hooks/useDebounce";
 import useSpotify from "../hooks/useSpotify";
-import Cell from "../components/Collection/Cell";
-import Songs from "../components/Songs";
 import {useRecoilState} from "recoil";
 import {titleAtom} from "../Atoms/titleAtom";
+import Spinner from "../components/Spinner";
+
+const Cell = lazy(() => import("../components/Collection/Cell"));
+const Songs = lazy(() => import("../components/Songs"));
 
 const Search = () => {
     const [, setTitle] = useRecoilState(titleAtom);
@@ -60,24 +62,26 @@ const Search = () => {
                 />
             </div>
             {((searchResults?.tracks?.total !== 0 || searchResults?.artists?.total !== 0 || searchResults?.albums?.total !== 0) && searchResults) ?
-                <div className={"pb-36 h-screen scrollbar-hide overflow-y-scroll"}>
-                    <p className={"flex flex-row space-x-4 text-white text-xl md:text-2xl xl:text-3xl font-bold m-5"}>{searchResults.tracks?.items.length !== 0 ? "Tracks" : "Tracks not found"}</p>
-                    <Songs playlist={searchResults.tracks?.items.slice(0, columnCount)}/>
-                    <p className={"flex flex-row space-x-4 text-white text-xl md:text-2xl xl:text-3xl font-bold m-5"}>{searchResults.artists?.items.length !== 0 ? "Artists" : "Artists not found"}</p>
-                    <div
-                        className={"auto-rows-min " + (columnCount !== 0 ? "grid" : "hidden")}
-                        style={{gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`}}>
-                        {searchResults.artists?.items.slice(0, columnCount).map(artist =>
-                            <Cell key={artist.id + "_cell"} collection={artist}/>)}
+                <Suspense fallback={<Spinner/>}>
+                    <div className={"pb-36 h-screen scrollbar-hide overflow-y-scroll"}>
+                        <p className={"flex flex-row space-x-4 text-white text-xl md:text-2xl xl:text-3xl font-bold m-5"}>{searchResults.tracks?.items.length !== 0 ? "Tracks" : "Tracks not found"}</p>
+                        <Songs playlist={searchResults.tracks?.items.slice(0, columnCount)}/>
+                        <p className={"flex flex-row space-x-4 text-white text-xl md:text-2xl xl:text-3xl font-bold m-5"}>{searchResults.artists?.items.length !== 0 ? "Artists" : "Artists not found"}</p>
+                        <div
+                            className={"auto-rows-min " + (columnCount !== 0 ? "grid" : "hidden")}
+                            style={{gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`}}>
+                            {searchResults.artists?.items.slice(0, columnCount).map(artist =>
+                                <Cell key={artist.id + "_cell"} collection={artist}/>)}
+                        </div>
+                        <p className={"flex flex-row space-x-4 text-white text-xl md:text-2xl xl:text-3xl font-bold m-5"}>{searchResults.albums?.items.length !== 0 ? "Albums" : "Albums not found"}</p>
+                        <div
+                            className={"auto-rows-min " + (columnCount !== 0 ? "grid" : "hidden")}
+                            style={{gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`}}>
+                            {searchResults.albums?.items.slice(0, columnCount).map(album =>
+                                <Cell key={album.id + "_cell"} collection={album}/>)}
+                        </div>
                     </div>
-                    <p className={"flex flex-row space-x-4 text-white text-xl md:text-2xl xl:text-3xl font-bold m-5"}>{searchResults.albums?.items.length !== 0 ? "Albums" : "Albums not found"}</p>
-                    <div
-                        className={"auto-rows-min " + (columnCount !== 0 ? "grid" : "hidden")}
-                        style={{gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`}}>
-                        {searchResults.albums?.items.slice(0, columnCount).map(album =>
-                            <Cell key={album.id + "_cell"} collection={album}/>)}
-                    </div>
-                </div>
+                </Suspense>
                 :
                 debouncedValue && (!isFetching)
                     ?

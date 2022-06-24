@@ -1,16 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {lazy, useEffect, useState, Suspense} from 'react';
 import {NextPage} from "next";
 import useSpotify from "../hooks/useSpotify";
-import Cell from "../components/Collection/Cell";
-import ArtistAlbums from "../components/ArtistAlbums";
 import {uniqBy, shuffle} from "lodash";
-import {useSession} from "next-auth/react";
 import {useRecoilState} from "recoil";
 import {titleAtom} from "../Atoms/titleAtom";
+import Spinner from "../components/Spinner";
+
+const Cell = lazy(() => import("../components/Collection/Cell"));
+const ArtistAlbums = lazy(() => import("../components/ArtistAlbums"));
 
 const Home: NextPage = () => {
     const [, setTitle] = useRecoilState(titleAtom);
-    const {data: session} = useSession();
     const spotifyApi = useSpotify();
     const hours = (new Date).getHours();
     const [playlists, setPlaylists] = useState<SpotifyApi.PlaylistObjectSimplified[]>([]);
@@ -43,7 +43,7 @@ const Home: NextPage = () => {
         if (spotifyApi.getAccessToken()) {
             getPlaylistsCategories().then();
         }
-    }, [session, spotifyApi]);
+    }, [spotifyApi.getAccessToken()]);
 
 
     return (
@@ -52,9 +52,11 @@ const Home: NextPage = () => {
                 Good {(hours < 6) || (hours > 22) ? "night" : (hours > 6) || (hours < 12) ? "morning" : "day"}!
                 <br/><br/>That's playlists for you:
             </header>
-            <ArtistAlbums>
-                {playlists?.map((playlist) => <Cell key={playlist?.id + "_cell"} collection={playlist}/>)}
-            </ArtistAlbums>
+            <Suspense fallback={<Spinner/>}>
+                <ArtistAlbums>
+                    {playlists?.map((playlist) => <Cell key={playlist?.id + "_cell"} collection={playlist}/>)}
+                </ArtistAlbums>
+            </Suspense>
         </div>
     )
 };

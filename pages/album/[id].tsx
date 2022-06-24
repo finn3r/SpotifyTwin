@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {lazy, useEffect, useState, Suspense} from 'react';
 import useSpotify from "../../hooks/useSpotify";
-import Songs from "../../components/Songs";
 import {useRouter} from "next/router";
-import AudioPage from "../../components/AudioPage";
 import {titleAtom} from "../../Atoms/titleAtom";
 import {useRecoilState} from "recoil";
+import Spinner from "../../components/Spinner";
+
+const AudioPage = lazy(() => import("../../components/AudioPage"));
+const Songs = lazy(() => import("../../components/Songs"));
 
 const Album = () => {
     const [, setTitle] = useRecoilState(titleAtom);
@@ -48,12 +50,14 @@ const Album = () => {
                 getAlbums(id).then();
             }
         }
-    }, [spotifyApi, router]);
+    }, [spotifyApi.getAccessToken(), router]);
 
     return (
-        <AudioPage info={album.info} error={album.error} type={"album"}>
-            <Songs playlist={album.info}/>
-        </AudioPage>
+        <Suspense fallback={<Spinner/>}>
+            <AudioPage info={album.info} error={album.error} type={"album"}>
+                <Songs playlist={album.info}/>
+            </AudioPage>
+        </Suspense>
     );
 };
 

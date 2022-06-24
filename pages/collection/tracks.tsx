@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import Songs from "../../components/Songs";
+import React, {lazy, Suspense, useEffect, useState} from 'react';
 import useSpotify from "../../hooks/useSpotify";
 import {useSession} from "next-auth/react";
-import AudioPage from "../../components/AudioPage";
 import {useRecoilState} from "recoil";
 import {titleAtom} from "../../Atoms/titleAtom";
+import Spinner from "../../components/Spinner";
+
+const AudioPage = lazy(() => import("../../components/AudioPage"));
+const Songs = lazy(() => import("../../components/Songs"));
 
 const Tracks = () => {
     const [, setTitle] = useRecoilState(titleAtom);
@@ -28,18 +30,23 @@ const Tracks = () => {
 
     useEffect(() => {
         setTitle("Saved tracks - Spotify tween");
-    },[]);
+    }, []);
 
     useEffect(() => {
         if (spotifyApi.getAccessToken()) {
             getTracks().then(tracks => setTracks(tracks));
         }
-    }, [session, spotifyApi]);
+    }, [session, spotifyApi.getAccessToken()]);
 
     return (
-        <AudioPage error={false} type={"tracks"} info={{images: [{url:"https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png"}], name: "Saved tracks"}}>
-            <Songs playlist={tracks}/>
-        </AudioPage>
+        <Suspense fallback={<Spinner/>}>
+            <AudioPage error={false} type={"tracks"} info={{
+                images: [{url: "https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png"}],
+                name: "Saved tracks"
+            }}>
+                <Songs playlist={tracks}/>
+            </AudioPage>
+        </Suspense>
     );
 };
 

@@ -1,12 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import Cell from "../../components/Collection/Cell";
+import React, {lazy, Suspense, useEffect, useState} from 'react';
 import useSpotify from "../../hooks/useSpotify";
 import {useSession} from "next-auth/react";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {userPlaylistsState} from "../../Atoms/platlistAtom";
-import Collection from "../../components/Collection";
 import {useRouter} from "next/router";
 import {titleAtom} from "../../Atoms/titleAtom";
+import Spinner from "../../components/Spinner";
+
+const Cell = lazy(() => import("../../components/Collection/Cell"));
+const Collection = lazy(() => import("../../components/Collection"));
 
 const Playlists = () => {
     const [, setTitle] = useRecoilState(titleAtom);
@@ -27,28 +29,29 @@ const Playlists = () => {
 
     useEffect(() => {
         setTitle("Playlists - Spotify tween");
-    },[]);
+    }, []);
 
     useEffect(() => {
         if (spotifyApi.getAccessToken()) {
             getTracks().then();
         }
-    }, [session, spotifyApi]);
+    }, [session, spotifyApi.getAccessToken()]);
 
     return (
-        <Collection>
-            {/*SAVED TRACKS*/}
-            <div
-                className={"saved_collection"}
-                onClick={() => router.push(`/collection/tracks`)}
-            >
-                <div className={"saved_background saved_tracks_background"}/>
-                <div className={"line-clamp-3 m-5 mt-12 z-10"}>
-                    {savedTracks?.info.split(" • ").map((track, id) => {
-                        const author: string = track.split(" - ")[0];
-                        const name: string = track.split(" - ")[1];
-                        return (
-                            <span key={id + "_savedTrack"}>
+        <Suspense fallback={<Spinner/>}>
+            <Collection>
+                {/*SAVED TRACKS*/}
+                <div
+                    className={"saved_collection"}
+                    onClick={() => router.push(`/collection/tracks`)}
+                >
+                    <div className={"saved_background saved_tracks_background"}/>
+                    <div className={"line-clamp-3 m-5 mt-12 z-10"}>
+                        {savedTracks?.info.split(" • ").map((track, id) => {
+                            const author: string = track.split(" - ")[0];
+                            const name: string = track.split(" - ")[1];
+                            return (
+                                <span key={id + "_savedTrack"}>
                                 <span className={"text-white"}>
                                     {author} -
                                 </span>
@@ -56,15 +59,16 @@ const Playlists = () => {
                                     {(id < savedTracks.info.split(" • ").length - 1) ? (" " + name + " • ") : (" " + name)}
                                 </span>
                             </span>);
-                    })}
+                        })}
+                    </div>
+                    <div className={"z-10"}>
+                        <p className={"text-xl md:text-2xl xl:text-5x text-white font-bold m-2"}>Saved tracks</p>
+                        <p className={"text-gray-400 font-bold m-2"}>{savedTracks?.count} saved tracks</p>
+                    </div>
                 </div>
-                <div className={"z-10"}>
-                    <p className={"text-xl md:text-2xl xl:text-5x text-white font-bold m-2"}>Saved tracks</p>
-                    <p className={"text-gray-400 font-bold m-2"}>{savedTracks?.count} saved tracks</p>
-                </div>
-            </div>
-            {playlists?.map((playlist) => <Cell key={playlist.id + "_cell"} collection={playlist}/>)}
-        </Collection>
+                {playlists?.map((playlist) => <Cell key={playlist.id + "_cell"} collection={playlist}/>)}
+            </Collection>
+        </Suspense>
     );
 };
 
