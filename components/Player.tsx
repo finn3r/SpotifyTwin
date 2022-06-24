@@ -120,7 +120,7 @@ const Player = () => {
 
     if (!statusVisible) return null;
     return (
-        <div>
+        <div className={"absolute w-screen bottom-0 z-40"}>
             {/*TrackLine*/}
             {trackState ?
                 <Slider

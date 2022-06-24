@@ -19,9 +19,7 @@ function MyApp({Component, pageProps: {session, ...pageProps}}: AppProps) {
                         <SideBar/>
                         <Component {...pageProps} />
                     </main>
-                    <div className={"absolute w-screen bottom-0 z-50"}>
-                        <Player/>
-                    </div>
+                    <Player/>
                 </div>
             </RecoilRoot>
         </SessionProvider>
