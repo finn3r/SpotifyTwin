@@ -1,25 +1,26 @@
-import React, {lazy, Suspense, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import useSpotify from "../../hooks/useSpotify";
 import {useRouter} from "next/router";
 import CollectionCell from "../../components/Collection/Cell";
 import {useRecoilState} from "recoil";
 import {titleAtom} from "../../Atoms/titleAtom";
 import Spinner from "../../components/Spinner";
-
-const AudioPage = lazy(() => import("../../components/AudioPage"));
-const ArtistAlbums = lazy(() => import("../../components/ArtistAlbums"));
-const Songs = lazy(() => import("../../components/Songs"));
+import {useSession} from "next-auth/react";
+import AudioPage from "../../components/AudioPage";
+import ArtistAlbums from "../../components/ArtistAlbums";
+import Songs from "../../components/Songs";
 
 const Artist = () => {
     const [, setTitle] = useRecoilState(titleAtom);
+    const {data: session} = useSession();
     const spotifyApi = useSpotify();
     const router = useRouter();
-    const [artist, setArtist] = useState<{ id: string, info: undefined | SpotifyApi.SingleArtistResponse, error: boolean, topTracks: SpotifyApi.TrackObjectFull[], albums: SpotifyApi.AlbumObjectSimplified[] }>({
+    const [artist, setArtist] = useState<{ id: string, info: undefined | SpotifyApi.SingleArtistResponse, status: string, topTracks: SpotifyApi.TrackObjectFull[], albums: SpotifyApi.AlbumObjectSimplified[] }>({
         id: "",
         info: undefined,
-        error: false,
         topTracks: [],
-        albums: []
+        albums: [],
+        status: "pending",
     });
 
     const getArtistAlbums = async (id: string) => {
@@ -43,17 +44,16 @@ const Artist = () => {
             const albums = await getArtistAlbums(id);
             const topTracks = await spotifyApi.getArtistTopTracks(id, profileCountry).then(data => data.body.tracks);
             setArtist({
-                ...artist,
                 topTracks,
                 info,
                 id,
-                albums
+                albums,
+                status: "success"
             });
         } catch (e) {
-            console.log(e);
             setArtist({
                 ...artist,
-                error: true
+                status: "error"
             });
         }
     };
@@ -63,34 +63,33 @@ const Artist = () => {
     }, [artist.info]);
 
     useEffect(() => {
-        if (spotifyApi.getAccessToken()) {
-            const {id} = router.query;
+        const {id} = router.query;
+        if (spotifyApi.getAccessToken() && (id !== artist.id)) {
             setArtist({
                 ...artist,
-                error: false
+                status: "pending"
             });
-            if ((typeof id === "string") && (id != artist.id)) {
+            if (typeof id === "string") {
                 getArtist(id).then();
-            }
+            } else setArtist({...artist, status: "error"});
         }
-    }, [router, spotifyApi.getAccessToken()]);
+    }, [router, spotifyApi, session]);
+
+    if(artist.status === "pending") return (<Spinner/>);
 
     return (
-        (artist.info) ?
-            <Suspense fallback={<Spinner/>}>
-                <AudioPage info={artist.info} error={artist.error} type={"artist"}>
-                    <div className={"flex flex-col text-white space-y-1"}>
-                        <p className={"pl-8 text-2xl md:text-3xl xl:text-5xl font-bold z-[5]"}>Top tracks</p>
-                    </div>
-                    <Songs playlist={artist.topTracks}/>
-                    <div className={"flex flex-col text-white space-y-1"}>
-                        <p className={"pl-8 text-2xl md:text-3xl xl:text-5xl font-bold z-[5]"}>Albums</p>
-                    </div>
-                    <ArtistAlbums>
-                        {artist.albums?.map((album) => <CollectionCell key={album.id + "_cell"} collection={album}/>)}
-                    </ArtistAlbums>
-                </AudioPage>
-            </Suspense> : <div/>
+        <AudioPage info={artist.info} error={artist.status === "error"} type={"artist"}>
+            <div className={"flex flex-col text-white space-y-1"}>
+                <p className={"pl-8 text-2xl md:text-3xl xl:text-5xl font-bold z-[5]"}>Top tracks</p>
+            </div>
+            <Songs playlist={artist.topTracks}/>
+            <div className={"flex flex-col text-white space-y-1"}>
+                <p className={"pl-8 text-2xl md:text-3xl xl:text-5xl font-bold z-[5]"}>Albums</p>
+            </div>
+            <ArtistAlbums>
+                {artist.albums?.map((album) => <CollectionCell key={album.id + "_cell"} collection={album}/>)}
+            </ArtistAlbums>
+        </AudioPage>
     );
 };
 

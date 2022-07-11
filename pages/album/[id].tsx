@@ -1,37 +1,37 @@
-import React, {lazy, useEffect, useState, Suspense} from 'react';
+import React, {useEffect, useState} from 'react';
 import useSpotify from "../../hooks/useSpotify";
 import {useRouter} from "next/router";
 import {titleAtom} from "../../Atoms/titleAtom";
 import {useRecoilState} from "recoil";
 import Spinner from "../../components/Spinner";
-
-const AudioPage = lazy(() => import("../../components/AudioPage"));
-const Songs = lazy(() => import("../../components/Songs"));
+import {useSession} from "next-auth/react";
+import AudioPage from "../../components/AudioPage";
+import Songs from "../../components/Songs";
 
 const Album = () => {
     const [, setTitle] = useRecoilState(titleAtom);
+    const {data: session} = useSession();
     const spotifyApi = useSpotify();
     const router = useRouter();
-    const [album, setAlbum] = useState<{ id: string, info: undefined | SpotifyApi.SingleAlbumResponse, error: boolean }>({
+    const [album, setAlbum] = useState<{ id: string, info: undefined | SpotifyApi.SingleAlbumResponse, status: string }>({
         id: "",
         info: undefined,
-        error: false
+        status: "pending"
     });
 
     const getAlbums = async (id: string) => {
         try {
             const info = await spotifyApi.getAlbum(id).then(data => data.body);
             setAlbum({
-                ...album,
                 info,
-                id
+                id,
+                status: "success"
             })
         } catch (e) {
             setAlbum({
                 ...album,
-                error: true
+                status: "error"
             });
-            console.log(e);
         }
     };
 
@@ -40,24 +40,24 @@ const Album = () => {
     }, [album.info]);
 
     useEffect(() => {
-        if (spotifyApi.getAccessToken()) {
-            const {id} = router.query;
+        const {id} = router.query;
+        if (spotifyApi.getAccessToken() && (id !== album.id)) {
             setAlbum({
                 ...album,
-                error: false
+                status: "pending"
             });
-            if ((typeof id === "string") && (id != album.id)) {
+            if (typeof id === "string") {
                 getAlbums(id).then();
-            }
+            } else setAlbum({...album, status: "error"});
         }
-    }, [spotifyApi.getAccessToken(), router]);
+    }, [spotifyApi, router, session]);
+
+    if (album.status === "pending") return (<Spinner/>);
 
     return (
-        <Suspense fallback={<Spinner/>}>
-            <AudioPage info={album.info} error={album.error} type={"album"}>
-                <Songs playlist={album.info}/>
-            </AudioPage>
-        </Suspense>
+        <AudioPage info={album.info} error={album.status==="error"} type={"album"}>
+            <Songs playlist={album.info}/>
+        </AudioPage>
     );
 };
 
