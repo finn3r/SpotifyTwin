@@ -58,7 +58,7 @@ const Search = () => {
                        onChange={value => setValue(value.target.value)}
                        placeholder={"Artist, track or album"}
                        type="text"
-                       className={"p-5 w-[calc(100%-13rem)] h-10 rounded-full bg-white border-gray-300 border-2 outline-none"}
+                       className={"p-5 w-[calc(100%-10rem)] md:w-[calc(100%-13rem)] h-10 rounded-full bg-white border-gray-300 border-2 outline-none"}
                 />
             </div>
             {((searchResults?.tracks?.total !== 0 || searchResults?.artists?.total !== 0 || searchResults?.albums?.total !== 0) && searchResults) ?

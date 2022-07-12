@@ -80,7 +80,6 @@ const Player = () => {
                     console.log(e);
                 });
             };
-            return script;
         } else {
             console.log("Sorry player available only on premium spotify account.")
             setStatusVisible(false);
@@ -104,19 +103,13 @@ const Player = () => {
 
     useEffect(() => {
         const token = spotifyApi.getAccessToken();
-        let scriptPromise: Promise<HTMLScriptElement | undefined>;
         if (token) {
-            scriptPromise = getPlayer(token).then();
+            getPlayer(token).then();
         }
         return () => {
-            (async () => {
-                const script = await scriptPromise;
-                player?.disconnect();
-                player?.removeListener("ready");
-                if(script)document.body.removeChild(script);
-            })();
+            player?.disconnect();
         }
-    }, [spotifyApi.getAccessToken()]);
+    }, [spotifyApi]);
 
     if (!statusVisible) return null;
     return (
@@ -161,7 +154,7 @@ const Player = () => {
                     </div>
                     : <div/>}
                 {/*Center*/}
-                <div className={"flex items-center justify-evenly"}>
+                <div className={"flex items-center justify-start space-x-1"}>
                     <SwitchHorizontalIcon className={"button"}/>
                     <RewindIcon
                         onClick={() => player?.previousTrack()}
@@ -179,7 +172,7 @@ const Player = () => {
                     <ReplyIcon className={"button"}/>
                 </div>
                 {/*Right*/}
-                <div className={"flex items-center space-x-3 md:space-x-4 justify-end pr-5"}>
+                <div className={"flex items-center space-x-3 md:space-x-4 justify-end pr-2"}>
                     {volume.isOff || volume.value === 0 ?
                         <VolumeOffIcon className={"button"} onClick={volumeOffHandler}/>
                         :

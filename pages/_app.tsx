@@ -13,7 +13,7 @@ function MyApp({Component, pageProps: {session, ...pageProps}}: AppProps) {
         <SessionProvider session={session}>
             <RecoilRoot>
                 <HeadTitle/>
-                <div className={"bg-black h-screen overflow-hidden min-w-[400px]"}>
+                <div className={"bg-black h-screen overflow-hidden"}>
                     <AccountButton/>
                     <main className={"flex"}>
                         <SideBar/>

@@ -63,8 +63,8 @@ const Home: NextPage = () => {
         default:
             return (
                 <div className={"h-screen overflow-y-scroll scrollbar-hide w-full relative bg-[#121212]"}>
-                    <header className={"flex flex-row space-x-4 text-white text-xl md:text-2xl xl:text-3xl font-bold m-5"}>
-                        Good {(hours < 6) || (hours > 22) ? "night" : (hours > 6) || (hours < 12) ? "morning" : "day"}!
+                    <header className={"flex flex-row space-x-4 text-white text-xl md:text-2xl xl:text-3xl font-bold m-5 pt-1"}>
+                        Good {(hours < 6) || (hours > 22) ? "night" : (hours > 6) || (hours < 12) ? "day" : "morning"}!
                         <br/><br/>That's playlists for you:
                     </header>
                     <ArtistAlbums>
