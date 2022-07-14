@@ -20,7 +20,7 @@ const Collection: React.FC = ({children}) => {
     return (
         <div className={"w-full h-screen bg-[#121212]"}>
             <header className={"flex flex-row flex-wrap text-white text-xl md:text-2xl xl:text-3xl font-bold m-5 mr-20"}>
-                <p className={`rounded-xl p-2 hover:cursor-pointer ml-12 ${(path.includes("playlists")) ? "bg-[#2a2a2a]" : ""}`}
+                <p className={`rounded-xl p-2 hover:cursor-pointer ml-12 sm:ml-0 ${(path.includes("playlists")) ? "bg-[#2a2a2a]" : ""}`}
                    onClick={() => router.push("/collection/playlists")}>Playlists</p>
                 <p className={`rounded-xl p-2 hover:cursor-pointer ${(path.includes("artists")) ? "bg-[#2a2a2a]" : ""}`}
                    onClick={() => router.push("/collection/artists")}>Artists</p>
