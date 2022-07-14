@@ -3,7 +3,7 @@ import React from 'react';
 const MenuButton = (props:{focus:boolean, changeFocus(state:boolean):void}) => {
     return (
         <button
-            className={`absolute top-5 right-20 z-[60] sm:hidden`}
+            className={`absolute top-5 ${props.focus ? "right-5" : "left-5"} transition-all duration-300 z-[60] sm:hidden`}
             onClick={() => props.changeFocus(!props.focus)}
         >
             <div

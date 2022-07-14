@@ -29,7 +29,7 @@ const Cell = (props: { collection: SpotifyApi.PlaylistObjectSimplified | Spotify
             break;
         }
     }
-    const path: string = `/${props.collection.type}/${props.collection.id}`;
+    const path: string = (props.collection?.type) ? `/${props.collection.type}/${props.collection.id}` : "";
     return (
         <div
             className={"flex flex-col content-start m-2 bg-[#1a1a1a] rounded-xl p-4 hover:cursor-pointer duration-500 hover:bg-[#202020] transition-all"}
