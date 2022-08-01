@@ -58,17 +58,17 @@ const Song = (props: { track: SpotifyApi.TrackObjectFull, order: number, playlis
                     }
                 </div>
                 {(props.track.album?.images?.[0]) ? <img
-                    className={"h-10 w-10"}
+                    className={"h-10 w-10 hidden xsm:block"}
                     src={props.track.album.images[0].url}
                     alt={""}
                 /> : null}
                 <div className={"min-w-0"}>
                     <p
-                        className={"truncate mr-4 " + (currentTrack?.id === props.track.id ? "text-green-600" : "text-white")}
+                        className={"line-clamp-1 " + (currentTrack?.id === props.track.id ? "text-green-600" : "text-white")}
                     >
                         {props.track.name}
                     </p>
-                    <p className={"truncate mr-4"}>{props.track.artists?.[0]?.name}</p>
+                    <p className={"line-clamp-1"}>{props.track.artists?.[0]?.name}</p>
                 </div>
             </div>
             <div className={"flex items-center justify-end ml-0 sm:justify-between min-w-0"}>

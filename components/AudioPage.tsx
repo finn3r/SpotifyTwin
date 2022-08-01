@@ -42,14 +42,14 @@ const AudioPage: React.FC<AudioPageProps> = ({children, info, error, type}) => {
                 </div> :
                 (info) ?
                     <section
-                        className={`flex items-end space-x-7 h-80 text-white p-8`}
+                        className={`flex items-end justify-center space-x-7 h-52 xsm:h-80 text-white p-8`}
                     >
                         {info.images?.[0]?.url ? <img
                             src={info.images[0].url}
                             alt=""
-                            className={"z-[5] object-cover h-44 w-44"}
+                            className={"z-[5] object-cover h-44 w-44 hidden xsm:block"}
                         /> : (type !== "episodes") ?
-                            <div className={"z-[5] h-44 w-44 bg-[#808080]"}>
+                            <div className={"z-[5] h-44 w-44 bg-[#808080] hidden xsm:block"}>
                                 <svg viewBox="-20 -25 100 100"
                                      className="mb-2 min-h-0 basis-[80%] bg-[#2a2a2a]" aria-hidden="true"
                                      data-testid="card-image-fallback">
@@ -58,7 +58,7 @@ const AudioPage: React.FC<AudioPageProps> = ({children, info, error, type}) => {
                                         fill="currentColor" fillRule="evenodd"/>
                                 </svg>
                             </div> :
-                            <div className={"z-[5] h-44 w-44 bg-[#006450] flex justify-center"}>
+                            <div className={"z-[5] h-44 w-44 bg-[#006450] flex justify-center hidden xsm:block"}>
                                 <svg role="img" viewBox="0 0 527 483" fill="none"
                                      xmlns="http://www.w3.org/2000/svg" className="w-[50%]">
                                     <path

@@ -148,7 +148,7 @@ const Player = () => {
                     <div className={"flex items-center space-x-4"}>
                         <img className={"hidden sm:inline h-10 w-10"} src={currentTrack.album.images?.[0]?.url} alt=""/>
                         <div>
-                            <h3>{currentTrack.name}</h3>
+                            <h3 className={"line-clamp-1"}>{currentTrack.name}</h3>
                             <p>{currentTrack.artists?.[0]?.name}</p>
                         </div>
                     </div>

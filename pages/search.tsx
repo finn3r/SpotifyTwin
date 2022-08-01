@@ -15,15 +15,15 @@ const Search = () => {
     const [isFetching, setIsFetching] = useState(false);
     const [searchResults, setSearchResults] = useState<SpotifyApi.SearchResponse>();
     const debouncedValue = useDebounce<string>(value, 250);
-    const cellMinWidth: number = 250;
-    const [columnCount, setColumnCount] = React.useState(0);
+    const [columnCount, setColumnCount] = useState(0);
     const widthHandler = () => {
-        (columnCount !== Math.round(window.innerWidth / cellMinWidth)) ? setColumnCount(Math.round(window.innerWidth / cellMinWidth)) : null
+        const cellMinWidth = (window.innerWidth < 600) ? 150 : 250;
+        setColumnCount(Math.round(window.innerWidth / cellMinWidth));
     };
 
     useEffect(() => {
         window.addEventListener("resize", widthHandler);
-        setColumnCount(Math.round(window.innerWidth / cellMinWidth));
+        setColumnCount(Math.round(window.innerWidth / ((window.innerWidth < 500) ? 150 : 250)));
         return () => {
             window.removeEventListener("resize", widthHandler);
         }
