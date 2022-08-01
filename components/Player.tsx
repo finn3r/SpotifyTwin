@@ -113,7 +113,7 @@ const Player = () => {
 
     if (!statusVisible) return null;
     return (
-        <div className={"absolute w-screen bottom-0 z-40"}>
+        <div className={"absolute w-screen bottom-0 z-40 bg-gradient-to-b from-black to-gray-900"}>
             {/*TrackLine*/}
             {trackState ?
                 <Slider
@@ -141,7 +141,7 @@ const Player = () => {
                 : null}
             {/*Player*/}
             <div
-                className={"h-16 pt-2 bg-gradient-to-b from-black to-gray-900 text-white grid grid-cols-3 text-xs md:text-base px-2 md:px-8"}
+                className={"h-16 pt-2 text-white grid grid-cols-3 text-xs md:text-base px-2 md:px-8"}
             >
                 {/*Left*/}
                 {(currentTrack) ?
@@ -154,7 +154,7 @@ const Player = () => {
                     </div>
                     : <div/>}
                 {/*Center*/}
-                <div className={"flex items-center justify-start space-x-1"}>
+                <div className={"flex items-center justify-center space-x-1"}>
                     <SwitchHorizontalIcon className={"button"}/>
                     <RewindIcon
                         onClick={() => player?.previousTrack()}
@@ -174,9 +174,9 @@ const Player = () => {
                 {/*Right*/}
                 <div className={"flex items-center space-x-3 md:space-x-4 justify-end pr-2"}>
                     {volume.isOff || volume.value === 0 ?
-                        <VolumeOffIcon className={"button"} onClick={volumeOffHandler}/>
+                        <VolumeOffIcon className={"button hidden sm:block"} onClick={volumeOffHandler}/>
                         :
-                        <VolumeUpIcon className={"button"} onClick={volumeOffHandler}/>
+                        <VolumeUpIcon className={"button hidden sm:block"} onClick={volumeOffHandler}/>
                     }
                     <input
                         className={"w-14 md:w-28"}
