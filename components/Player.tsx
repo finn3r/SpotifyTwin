@@ -109,7 +109,7 @@ const Player = () => {
         return () => {
             player?.disconnect();
         }
-    }, [spotifyApi]);
+    }, [spotifyApi.getAccessToken()]);
 
     if (!statusVisible) return null;
     return (
@@ -146,7 +146,7 @@ const Player = () => {
                 {/*Left*/}
                 {(currentTrack) ?
                     <div className={"flex items-center space-x-4"}>
-                        <img className={"hidden md:inline h-10 w-10"} src={currentTrack.album.images?.[0]?.url} alt=""/>
+                        <img className={"hidden sm:inline h-10 w-10"} src={currentTrack.album.images?.[0]?.url} alt=""/>
                         <div>
                             <h3>{currentTrack.name}</h3>
                             <p>{currentTrack.artists?.[0]?.name}</p>
