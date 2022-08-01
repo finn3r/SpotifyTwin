@@ -42,7 +42,7 @@ const AudioPage: React.FC<AudioPageProps> = ({children, info, error, type}) => {
                 </div> :
                 (info) ?
                     <section
-                        className={`flex items-end justify-center space-x-7 h-52 xsm:h-80 text-white p-8`}
+                        className={`flex items-end justify-center xsm:justify-start space-x-7 h-52 xsm:h-80 text-white p-8`}
                     >
                         {info.images?.[0]?.url ? <img
                             src={info.images[0].url}
