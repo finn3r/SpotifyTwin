@@ -6,9 +6,7 @@ import {
     FastForwardIcon,
     PauseIcon,
     PlayIcon,
-    ReplyIcon,
     RewindIcon,
-    SwitchHorizontalIcon
 } from "@heroicons/react/solid";
 import {VolumeUpIcon, VolumeOffIcon} from "@heroicons/react/outline";
 import {playerAtom} from "../Atoms/playerAtom";
@@ -159,8 +157,7 @@ const Player = () => {
                     </div>
                     : <div/>}
                 {/*Center*/}
-                <div className={"flex items-center justify-center space-x-1"}>
-                    <SwitchHorizontalIcon className={"button"}/>
+                <div className={"flex items-center justify-center space-x-3"}>
                     <RewindIcon
                         onClick={() => player?.previousTrack()}
                         className={"button"}
@@ -174,14 +171,13 @@ const Player = () => {
                         onClick={() => player?.nextTrack()}
                         className={"button"}
                     />
-                    <ReplyIcon className={"button"}/>
                 </div>
                 {/*Right*/}
                 <div className={"flex items-center space-x-3 md:space-x-4 justify-end pr-2"}>
                     {volume.isOff || volume.value === 0 ?
-                        <VolumeOffIcon className={"button hidden sm:block"} onClick={volumeOffHandler}/>
+                        <VolumeOffIcon className={"button"} onClick={volumeOffHandler}/>
                         :
-                        <VolumeUpIcon className={"button hidden sm:block"} onClick={volumeOffHandler}/>
+                        <VolumeUpIcon className={"button"} onClick={volumeOffHandler}/>
                     }
                     <input
                         className={"w-14 md:w-28"}
