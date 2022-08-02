@@ -14,10 +14,13 @@ import {VolumeUpIcon, VolumeOffIcon} from "@heroicons/react/outline";
 import {playerAtom} from "../Atoms/playerAtom";
 import Slider from "./Slider";
 import {deviceAtom} from "../Atoms/deviceAtom";
+import MobileDetect from "mobile-detect";
+import {useSession} from "next-auth/react";
 
 const Player = () => {
+    const {data: session} = useSession();
     const spotifyApi = useSpotify();
-    const [statusVisible, setStatusVisible] = useState(true);
+    const [statusVisible, setStatusVisible] = useState(false);
     const [currentTrack, setCurrentTrack] = useRecoilState(currentTrackState);
     const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
     const [player, setPlayer] = useRecoilState(playerAtom);
@@ -42,6 +45,7 @@ const Player = () => {
     const getPlayer = async (token: string) => {
         const status = await spotifyApi.getMe().then((data) => data.body.product === "premium");
         if (status) {
+            setStatusVisible(true);
             const script = document.createElement("script");
             script.src = "https://sdk.scdn.co/spotify-player.js";
             script.async = true;
@@ -103,13 +107,14 @@ const Player = () => {
 
     useEffect(() => {
         const token = spotifyApi.getAccessToken();
-        if (token) {
+        const deviceType = new MobileDetect(window.navigator.userAgent);
+        if (token && !deviceType.mobile() && !player) {
             getPlayer(token).then();
         }
         return () => {
             player?.disconnect();
         }
-    }, [spotifyApi.getAccessToken()]);
+    }, [spotifyApi, session]);
 
     if (!statusVisible) return null;
     return (
