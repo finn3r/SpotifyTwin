@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import Vibrant from "node-vibrant";
-import Spinner from "./Spinner";
 
 interface AudioPageProps {
     info?: SpotifyApi.SingleAlbumResponse | SpotifyApi.SinglePlaylistResponse | SpotifyApi.SingleShowResponse | { images?: { url: string }[], name: string },
@@ -10,22 +9,15 @@ interface AudioPageProps {
 
 const AudioPage: React.FC<AudioPageProps> = ({children, info, error, type}) => {
     const [color, setColor] = useState<string>("");
-    const [fetching, setFetching] = useState(false);
 
     useEffect(() => {
-        setFetching(true);
+        setColor("#121212");
         if(info?.images?.[0]?.url){
             new Vibrant(info.images[0].url).getPalette().then((palette) => {
                 setColor(palette.DarkVibrant!.hex);
-                setFetching(false);
             })
-        } else {
-            setColor("#121212");
-            setFetching(false);
         }
     }, [info]);
-
-    if(fetching) return <Spinner/>
 
     return (
         <div id={"audio_container"}
