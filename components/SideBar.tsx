@@ -40,7 +40,7 @@ const SideBar = () => {
         <div>
             <MenuButton focus={focus} changeFocus={setFocus}/>
             <div
-                className={`${focus ? "absolute w-full z-50 h-full sm:static" : "hidden"} bg-black sm:block text-gray-500 p-5 text-xs border-r border-gray-900 lg:text-sm sm:max-w-[12rem] lg:max-w-[15rem] pb-36`}>
+                className={`${focus ? "absolute w-full z-50 h-screen sm:static" : "hidden"} overflow-hidden bg-black sm:block text-gray-500 p-5 text-xs border-r border-gray-900 lg:text-sm sm:max-w-[12rem] lg:max-w-[15rem] pb-36`}>
                 <div className={"space-y-4"}>
                     {/*Buttons*/}
                     <button

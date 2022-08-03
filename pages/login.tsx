@@ -15,7 +15,7 @@ const Login = (props: { [p: string]: Record<LiteralUnion<BuiltInProviderType>, C
     },[]);
 
     return (
-        <div className={"absolute z-50 flex flex-col items-center bg-black min-h-screen w-full justify-center"}>
+        <div className={"absolute z-[70] flex flex-col items-center bg-black min-h-screen w-full justify-center"}>
             <img src={spotifyLogo} alt="Spotify Logo" className={"w-52 mb-5"}/>
             {Object.values(props.providers).map((provider) => (
                 <div key={provider.name}>
