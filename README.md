@@ -8,6 +8,7 @@ This application was created exclusively for educational purposes based on the o
 * Tailwind
 * Recoil
 * Lodash
+* Spotify API
 
 ## Application Image
 
